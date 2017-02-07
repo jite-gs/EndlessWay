@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using DebugStuff;
 using UnityEngine;
 
 public class PuzzleField
@@ -30,7 +31,7 @@ public class PuzzleField
 		if (_slices == null || _slices.Length != Size * Size)
 		{
 			hasChangedSize = true;
-			_slices = new int[Size - 1, Size - 1];
+			_slices = new int[Size, Size];
 		}
 
 		int sliceNum = 1;
@@ -41,7 +42,8 @@ public class PuzzleField
 				_slices[horizIdx, vertIdx] = sliceNum++;
 			}
 		}
-		_slices[Size, Size] = 0;
+		_slices[Size-1, Size-1] = 0;
+		Logs.Log(_slices.VarDump("slices at size=" + Size)); //2del
 		return hasChangedSize;
 	}
 }
