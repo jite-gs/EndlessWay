@@ -1,0 +1,62 @@
+# =============== #
+# Unity generated #
+# =============== #
+Temp/
+Obj/
+UnityGenerated/
+Library/
+
+# ===================================== #
+# Visual Studio / MonoDevelop generated #
+# ===================================== #
+ExportedObj/
+*.svd
+*.userprefs
+*.csproj
+*.pidb
+*.suo
+*.sln
+*.sln.meta
+*.user
+*.unityproj
+*.booproj
+*.favdoc
+
+#builds
+*.ipa
+*.log
+
+# ===================================== #
+# Eclipse generated                     #
+# ===================================== #
+.buildpath
+.project
+.settings/
+.sass-cache/
+
+# ============ #
+# OS generated #
+# ============ #
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+# Icon?
+ehthumbs.db
+Thumbs.db
+
+# ===================================== #
+#  Project                              #
+# ===================================== #
+
+# ===================================== #
+#  Mobile Project                       #
+# ===================================== #
+
+/ProjectSettings/*.*
+
+
+# ===================================== #
+#  Doxygen output                       #
+# ===================================== #
