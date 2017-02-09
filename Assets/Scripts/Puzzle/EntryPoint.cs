@@ -1,19 +1,39 @@
-﻿using DebugStuff;
+using System.Collections.Generic;
+using DebugStuff;
 using UnityEngine;
 
-public class EntryPoint : MonoBehaviour
+namespace Puzzle
 {
-
-	void Start()
+	public class EntryPoint : MonoBehaviour
 	{
-		Logs.Log("Test {0} {1}", 1.VarDump("vd test"), 2.VarDump("vd test", 0, true));
-		//		Logs.DoLogging = false;
-		//		Logs.Log("Test {0} {1}", 5, 6);
-		//		Logs.DoLogging = true;
-		//		Logs.Log("Test {0} {1}", 3, 4);
-		var pf = new PuzzleField();
-		pf.InitSize(12);
+		//		private int[, ,] arrInt3 = new int[,,]
+		//		{
+		//			{
+		//				{ 1, 2, 0 }, 
+		//				{ 2, 4, 4 }
+		//			},
+		//			{
+		//				{ 21, 22, 20 }, 
+		//				{ 22, 24, 24 }
+		//			}
+		//		};
+
+		void Start()
+		{
+			//Logs.Log(arrInt3.VarDumpVerbose("arrInt3"));
+
+			var puzzleField = new PuzzleField();
+			puzzleField.InitSize(10);
+
+			List<SliceMove> moves;
+			var res = puzzleField.TryToSlide(new SlicePosition(0, puzzleField.Size - 1), out moves);
+			Logs.Log("try={0}, {1}", res, moves.VarDump("moves"));
+			Logs.Log(puzzleField.SlicesToString());
+			
+			res = puzzleField.TryToSlide(new SlicePosition(0, 0), out moves);
+			Logs.Log("try={0}, {1}", res, moves.VarDump("moves"));
+			Logs.Log(puzzleField.SlicesToString());
+		}
 
 	}
-
 }
