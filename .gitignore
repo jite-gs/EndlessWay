@@ -21,7 +21,7 @@ ExportedObj/
 *.unityproj
 *.booproj
 *.favdoc
-
+*.dgml
 #builds
 *.ipa
 *.log
