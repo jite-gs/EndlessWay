@@ -1,5 +1,6 @@
 namespace Puzzle
 {
+#pragma warning disable 661, 659 //GetHashCode
 	public struct SlicePosition
 	{
 		public int X, Y;
@@ -50,4 +51,5 @@ namespace Puzzle
 			return !posA.Equals(posB);
 		}
 	}
+#pragma warning restore 661, 659
 }
