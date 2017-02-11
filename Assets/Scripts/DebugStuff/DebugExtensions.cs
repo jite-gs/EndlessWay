@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using UnityEngine;
 
 namespace DebugStuff
 {
@@ -10,15 +9,15 @@ namespace DebugStuff
 
 		//=== IsNull ==========================================================
 
-		public static bool IsNull<T>(this T targetVar, string varName, Type reporterType, string reporterName = null) where T : class 
+		public static bool IsNull<T>(this T targetVar, string varName, Type reporterType, string reporterName = null) where T : class
 		{
 			bool res = targetVar == null;
 			if (res)
-				Debug.Log(string.Format("In <{0}>{1}: <{2}> '{3}' is null!",
+				Logs.LogError("In <{0}>{1}: <{2}> '{3}' is null!",
 					reporterType.Name,
 					string.IsNullOrEmpty(reporterName) ? "" : " '" + reporterName + "'",
 					typeof(T),
-					varName));
+					varName);
 			return res;
 		}
 
