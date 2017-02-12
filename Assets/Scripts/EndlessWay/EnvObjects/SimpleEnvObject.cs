@@ -3,6 +3,9 @@ using UnityEngine;
 
 namespace EndlessWay
 {
+	/// <summary>
+	/// Объект с одним мешем
+	/// </summary>
 	public class SimpleEnvObject : EnvObject
 	{
 		public MeshRenderer meshRenderer;
@@ -38,11 +41,11 @@ namespace EndlessWay
 
 		//=== Public ==========================================================
 
-		//		public override void Setup()
-		//		{
-		//			base.Setup();
-		//		}
-		//
+		public override Vector2 GetOccupiedArea()
+		{
+			return new Vector2(MeshSize, MeshSize);
+		}
+
 		public override void ApplyColors()
 		{
 			if (meshRenderer == null)
@@ -54,12 +57,12 @@ namespace EndlessWay
 		public override void ApplySizes()
 		{
 			meshTransform.localScale = new Vector3(
-				meshOrgScale.x * MeshSize, 
-				meshOrgScale.x * MeshSize, 
+				meshOrgScale.x * MeshSize,
+				meshOrgScale.x * MeshSize,
 				meshOrgScale.x * MeshSize);
 			meshTransform.localPosition = new Vector3(
-				meshOrgPosition.x * MeshSize, 
-				meshOrgPosition.y * MeshSize, 
+				meshOrgPosition.x * MeshSize,
+				meshOrgPosition.y * MeshSize,
 				meshOrgPosition.z * MeshSize);
 			meshTransform.localRotation = Quaternion.identity; //TODO
 		}

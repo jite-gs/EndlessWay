@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace EndlessWay
 {
-	public class EnvObject : MonoBehaviour
+	public class EnvObject : MonoBehaviour, IAreaObject
 	{
 		/// <summary>
 		/// Цвета объекта
@@ -16,34 +16,46 @@ namespace EndlessWay
 		/// </summary>
 		public float[] sizes;
 
-		private EnvObjectSpecification _envObjectSpecification;
-
 		private static Type _selfType = typeof(EnvObject);
+
+
+		//=== Props ===========================================================
+
+		public bool IsWrong { get; private set; }
+
+		public Vector3 Point
+		{
+			get { return transform.localPosition; }
+			set { transform.localPosition = value; }
+		}
 
 
 		//=== Public ==========================================================
 
-		public void SetSpecification(EnvObjectSpecification envObjectSpecification)
+		public virtual void ApplySpecification(IAreaObjectSpecification areaObjectSpecification)
 		{
-			_envObjectSpecification = envObjectSpecification;
-		}
-
-		public virtual void Setup()
-		{
-			if (_envObjectSpecification.IsNull("_envObjectSpecification", _selfType) || _envObjectSpecification.IsWrong)
-				return;
-
-			if (_envObjectSpecification.IsColorable)
+			if (areaObjectSpecification.IsNull("areaObjectSpecification", _selfType) || areaObjectSpecification.IsWrong)
 			{
-				colors = _envObjectSpecification.GetColors();
+				IsWrong = true;
+				return;
+			}
+
+			if (areaObjectSpecification.IsColorable)
+			{
+				colors = areaObjectSpecification.GetColors();
 				ApplyColors();
 			}
 
-			if(_envObjectSpecification.IsSizeable)
+			if (areaObjectSpecification.IsSizeable)
 			{
-				sizes = _envObjectSpecification.GetSizes();
+				sizes = areaObjectSpecification.GetSizes();
 				ApplySizes();
 			}
+		}
+
+		public virtual Vector2 GetOccupiedArea()
+		{
+			return Vector3.zero;
 		}
 
 		public virtual void ApplySizes()

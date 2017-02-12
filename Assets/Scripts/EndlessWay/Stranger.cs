@@ -6,6 +6,9 @@ using UnityEngine;
 
 namespace EndlessWay
 {
+	/// <summary>
+	/// Стартовый скрипт EndlessWay
+	/// </summary>
 	public class Stranger : MonoBehaviour
 	{
 		public EnvObject[] envObjects;
@@ -65,11 +68,13 @@ namespace EndlessWay
 					Logs.Log("_prefabs['{0}'] hasn't specification", kvp.Key);
 			}
 
-			Logs.Log(_prefabs.VarDump("_prefabs")); //2del
+			//			Logs.Log(_prefabs.VarDump("_prefabs")); //2del
 
 			//			obj.SetSpecification(spec);
 			//			obj.Setup();
+
 		}
+
 
 
 		private float _period = .33f;

@@ -5,8 +5,11 @@ using UnityEngine;
 
 namespace EndlessWay
 {
+	/// <summary>
+	/// Базовые правила случайных параметров объекта
+	/// </summary>
 	[Serializable]
-	public class EnvObjectSpecification
+	public class EnvObjectSpecification : IAreaObjectSpecification
 	{
 		public string associatedEnvObjectName;
 		public int colorsLength;
