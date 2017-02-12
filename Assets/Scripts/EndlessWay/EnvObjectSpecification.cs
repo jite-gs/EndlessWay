@@ -8,14 +8,15 @@ namespace EndlessWay
 	[Serializable]
 	public class EnvObjectSpecification
 	{
+		public string associatedEnvObjectName;
 		public int colorsLength;
 		public int sizesLength;
 
 		public ColorRange[] colorRanges;
 		public SizeRange[] sizeRanges;
 
-
 		private IRandom _random;
+
 		private static Type _selfType = typeof(EnvObjectSpecification);
 
 
