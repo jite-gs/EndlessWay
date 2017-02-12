@@ -1,5 +1,6 @@
 using System;
 using DebugStuff;
+using SomeRandom;
 using UnityEngine;
 
 namespace EndlessWay
@@ -14,7 +15,7 @@ namespace EndlessWay
 		public SizeRange[] sizeRanges;
 
 
-		private Func<float> _randomFactor;
+		private IRandom _random;
 		private static Type _selfType = typeof(EnvObjectSpecification);
 
 
@@ -29,11 +30,11 @@ namespace EndlessWay
 
 		//=== Public ==========================================================
 
-		public bool Init(Func<float> randomFactor)
+		public bool Init(IRandom random)
 		{
 			IsWrong = false;
-			_randomFactor = randomFactor;
-			if (_randomFactor.IsNull("_randomFactor", _selfType))
+			_random = random;
+			if (_random.IsNull("_random", _selfType))
 			{
 				IsWrong = true;
 				return false;
@@ -53,7 +54,7 @@ namespace EndlessWay
 				for (int i = 0, len = sizeRanges.Length; i < len; i++)
 				{
 					var sizeRange = sizeRanges[i];
-					sizeRange.Init(_randomFactor);
+					sizeRange.Init();
 					if (sizeRange.IsWrong)
 					{
 						Logs.LogError("EnvObjectSpecification: sizeRange[{0}] is wrong!", i);
@@ -77,7 +78,7 @@ namespace EndlessWay
 				for (int i = 0, len = colorRanges.Length; i < len; i++)
 				{
 					var colorRange = colorRanges[i];
-					colorRange.Init(_randomFactor);
+					colorRange.Init();
 					if (colorRange.IsWrong)
 					{
 						Logs.LogError("EnvObjectSpecification: colorRange[{0}] is wrong!", i);
@@ -95,7 +96,7 @@ namespace EndlessWay
 			var randomColors = new Color[colorsLength];
 			for (int i = 0; i < colorsLength; i++)
 			{
-				randomColors[i] = colorRanges[i].GetColorByRandomFactor();
+				randomColors[i] = colorRanges[i].GetColorByRandomFactor(_random);
 			}
 			return randomColors;
 		}
@@ -105,7 +106,7 @@ namespace EndlessWay
 			var randomSizes = new float[sizesLength];
 			for (int i = 0; i < sizesLength; i++)
 			{
-				randomSizes[i] = sizeRanges[i].GetSizeByRandomFactor();
+				randomSizes[i] = sizeRanges[i].GetSizeByRandomFactor(_random);
 			}
 			return randomSizes;
 		}

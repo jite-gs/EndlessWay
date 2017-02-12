@@ -1,5 +1,5 @@
 using System;
-using DebugStuff;
+using SomeRandom;
 using UnityEngine;
 
 namespace EndlessWay
@@ -21,14 +21,10 @@ namespace EndlessWay
 		public float loSize;
 		public float hiSize;
 
-		private Func<float> _randomFactor;
-
 		//Кешированные параметры для быстрого расчета
-		private float _min, _delta;
+		private float _min, _max;
 		private bool _isConst;
 		private int _fixedSizesLength;
-
-		private static Type _selfType = typeof(SizeRange);
 
 
 		//=== Props ===========================================================
@@ -38,35 +34,23 @@ namespace EndlessWay
 
 		//=== Public ==========================================================
 
-		public float GetSizeByRandomFactor()
+		public float GetSizeByRandomFactor(IRandom random)
 		{
 			if (IsWrong)
 				return 0;
 
 			if (isFixedSizes)
 			{
-				if (_fixedSizesLength == 1)
-					return fixedSizes[0];
-
-				int index = (int)(_randomFactor() * _fixedSizesLength);
-				if (index == _fixedSizesLength)
-					index = _fixedSizesLength - 1;
-
-				return fixedSizes[index];
+				return _fixedSizesLength == 1
+					? fixedSizes[0]
+					: fixedSizes[random.Range(0, _fixedSizesLength)];
 			}
-			return _isConst ? _min : _delta * _randomFactor() + _min;
+			return _isConst ? _min: random.Range(_min, _max);
 		}
 
-		public void Init(Func<float> randomFactor)
+		public void Init()
 		{
 			IsWrong = false;
-			_randomFactor = randomFactor;
-			if (_randomFactor.IsNull("_randomFactor", _selfType))
-			{
-				IsWrong = true;
-				return;
-			}
-
 			if (isFixedSizes)
 			{
 				if (fixedSizes == null || fixedSizes.Length == 0)
@@ -80,7 +64,7 @@ namespace EndlessWay
 			else
 			{
 				_min = Mathf.Min(loSize, hiSize);
-				_delta = Mathf.Abs(loSize - hiSize);
+				_max = Mathf.Max(loSize, hiSize);
 				_isConst = Mathf.Approximately(loSize, hiSize);
 			}
 		}

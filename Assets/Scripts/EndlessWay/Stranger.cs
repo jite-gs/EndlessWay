@@ -1,5 +1,6 @@
 using System;
 using DebugStuff;
+using SomeRandom;
 using UnityEngine;
 
 namespace EndlessWay
@@ -18,7 +19,7 @@ namespace EndlessWay
 			if (spec.IsNull("spec", _selfType) || obj.IsNull("obj", _selfType))
 				return;
 
-			if (!spec.Init(UnityRandom))
+			if (!spec.Init(new UnityRandom()))
 				return;
 
 			obj.SetSpecification(spec);
@@ -26,10 +27,10 @@ namespace EndlessWay
 		}
 
 
-		private float _period = 1;
-		private float _lastTime = 0;
-		private float _pseudoRandomDelta = .01f;
-		private float _pseudoRandom = 0;
+		private float _period = .33f;
+		private float _lastTime;
+//		private float _pseudoRandomDelta = .01f;
+//		private float _pseudoRandom = 0;
 
 		private void Update()
 		{
@@ -47,10 +48,6 @@ namespace EndlessWay
 
 		//=== Private =========================================================
 
-		private float UnityRandom()
-		{
-			return UnityEngine.Random.value;
-		}
 
 
 
