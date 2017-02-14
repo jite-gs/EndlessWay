@@ -93,7 +93,7 @@ namespace EndlessWay
 					break;
 
 				var areaObject = _areaObjectSource.GetObject(areaObjectName, parentTransform);
-				if (areaObject.IsNull("areaObject", _selfType))
+				if (areaObject == null)
 					break;
 
 				areaObject.ApplySpecification(specification);

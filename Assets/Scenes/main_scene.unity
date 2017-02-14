@@ -105,7 +105,7 @@ GameObject:
   - component: {fileID: 400209921}
   m_Layer: 0
   m_Name: Main Camera
-  m_TagString: Untagged
+  m_TagString: MainCamera
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -116,14 +116,14 @@ AudioListener:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 400209920}
-  m_Enabled: 1
+  m_Enabled: 0
 --- !u!124 &400209922
 Behaviour:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 400209920}
-  m_Enabled: 1
+  m_Enabled: 0
 --- !u!92 &400209923
 Behaviour:
   m_ObjectHideFlags: 0
@@ -140,7 +140,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 1
-  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
+  m_BackGroundColor: {r: 0.39938366, g: 0.49856126, b: 0.6544118, a: 0.391}
   m_NormalizedViewPortRect:
     serializedVersion: 2
     x: 0
@@ -379,9 +379,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2bd0a5e9b716d69409a7d4a2c274b90e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  period: 1
+  density: 0.1
+  maxObjects: 1000
+  movementSpeed: 20
+  objectsAreaDepth: 500
+  objectsAreaWidth: 500
+  objectsAreaOffset: 50
+  areaFillsInterval: 50
   objectsParent: {fileID: 1225082103}
-  envObjects:
+  envObjectPrefabs:
   - {fileID: 114409518561742500, guid: ef5e66b679cfda9499d6111325cd099e, type: 2}
   - {fileID: 114409518561742500, guid: 4eea2683a19f8cc4899cc9e70cefa4ed, type: 2}
   - {fileID: 114930824864790672, guid: 21e9b3cf614452f4b8106d05147cbd97, type: 2}
@@ -411,10 +417,22 @@ MonoBehaviour:
     colorRanges: []
     sizeRanges: []
   - associatedEnvObjectName: SphereObject
-    colorsLength: 0
-    sizesLength: 0
-    colorRanges: []
-    sizeRanges: []
+    colorsLength: 1
+    sizesLength: 1
+    colorRanges:
+    - isFixedColors: 1
+      fixedColors:
+      - {r: 1, g: 0, b: 0, a: 1}
+      - {r: 1, g: 1, b: 0, a: 1}
+      - {r: 0, g: 1, b: 0, a: 1}
+      - {r: 1, g: 1, b: 1, a: 1}
+      loColor: {r: 0, g: 0, b: 0, a: 0}
+      hiColor: {r: 0, g: 0, b: 0, a: 0}
+    sizeRanges:
+    - isFixedSizes: 0
+      fixedSizes: []
+      loSize: 1
+      hiSize: 10
 --- !u!4 &1687563865
 Transform:
   m_ObjectHideFlags: 0

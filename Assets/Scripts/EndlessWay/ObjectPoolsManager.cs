@@ -9,10 +9,9 @@ namespace EndlessWay
 	{
 		private Dictionary<string, ObjectPool<EnvObject>> _pools = new Dictionary<string, ObjectPool<EnvObject>>();
 		private Dictionary<EnvObject, ObjectPool<EnvObject>> _allInstances;
+		private Vector3 _freeObjectsPoint;
 
 		private Type _selfType;
-
-		private Vector3 _outPoint = Vector3.up * 100;
 
 
 		//=== Prop ============================================================
@@ -32,6 +31,15 @@ namespace EndlessWay
 				return count;
 			}
 		}
+
+
+		//=== Ctor ============================================================
+
+		public ObjectPoolsManager(Vector3 freeObjectsPoint)
+		{
+			_freeObjectsPoint = freeObjectsPoint;
+		}
+
 
 		//=== Public ==========================================================
 
@@ -61,6 +69,7 @@ namespace EndlessWay
 			var envObject = pool.GetObject(parentTransform);
 			if (envObject != null && !_allInstances.ContainsKey(envObject))
 				_allInstances.Add(envObject, pool);
+
 			return envObject;
 		}
 
@@ -78,7 +87,7 @@ namespace EndlessWay
 			}
 
 			pool.Release(envObject);
-			envObject.transform.localPosition = _outPoint;
+			envObject.transform.localPosition = _freeObjectsPoint;
 		}
 	}
 }

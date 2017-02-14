@@ -10,6 +10,8 @@ namespace EndlessWay
 		private List<T> _pool;
 		private T _prefab;
 
+		private bool _isVerbose = false;
+
 		private Type _selfType;
 
 
@@ -47,7 +49,8 @@ namespace EndlessWay
 
 			if (ObjectsCount < MaxObjects)
 				return CreateNewObject(parentTransform);
-
+			if (_isVerbose)
+				Logs.Log("GetObject() maxObjects limit={0}", MaxObjects); //DEBUG
 			return null;
 		}
 

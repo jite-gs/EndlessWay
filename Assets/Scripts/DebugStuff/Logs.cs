@@ -1,10 +1,10 @@
-﻿using UnityEngine;
+using UnityEngine;
 
 public static class Logs
 {
 	public static bool DoLogging
 	{
-		get { return Debug.logger.logEnabled; }
+		get { return Debug.logger.logEnabled && Application.isEditor; }
 		set { Debug.logger.logEnabled = value; }
 	}
 
