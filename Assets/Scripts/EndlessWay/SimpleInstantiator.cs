@@ -14,7 +14,7 @@ namespace EndlessWay
 
 		//=== Public ==========================================================
 
-		public void Init(Dictionary<string, EnvObject> prefabsByPrototypeName)
+		public void Init(Dictionary<string, EnvObject> prefabsByPrototypeName, int maxObjectsByPrototype)
 		{
 			if (prefabsByPrototypeName == null)
 				throw new NullReferenceException("prefabsByPrototypeName is null");
@@ -22,7 +22,7 @@ namespace EndlessWay
 			_prefabsByPrototypeName = prefabsByPrototypeName;
 		}
 
-		public IAreaObject GetObject(string objectPrototypeName, Transform parenTransform)
+		public IAreaObject GetObject(string objectPrototypeName, Transform parentTransform)
 		{
 			EnvObject prefabByPrototypeName;
 			if (!_prefabsByPrototypeName.TryGetValue(objectPrototypeName, out prefabByPrototypeName))
@@ -31,7 +31,7 @@ namespace EndlessWay
 				return null;
 			}
 
-			return UnityEngine.Object.Instantiate<EnvObject>(prefabByPrototypeName, parenTransform);
+			return UnityEngine.Object.Instantiate<EnvObject>(prefabByPrototypeName, parentTransform);
 		}
 
 		public void ReleaseObject(IAreaObject areaObject)

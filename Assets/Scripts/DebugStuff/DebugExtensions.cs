@@ -45,7 +45,7 @@ namespace DebugStuff
 			{
 				var simpleTypeName = type.Name;
 				var isArray = type.IsArray;
-				if (type.IsPrimitive || isArray) // �� object, �� decimal
+				if (type.IsPrimitive || isArray)
 				{
 					foreach (var kvp in SystemTypeNameToNiceName)
 					{

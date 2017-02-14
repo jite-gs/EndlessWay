@@ -23,6 +23,7 @@ namespace EndlessWay
 			= new Dictionary<string, KeyValuePair<EnvObject, EnvObjectSpecification>>(5000);
 
 		private Composer _composer;
+		private ObjectPoolsManager _objectPoolsManager;
 		private List<IAreaObject> _allAreaObjects = new List<IAreaObject>(5000);
 
 		private Type _selfType = typeof(Main);
@@ -87,32 +88,38 @@ namespace EndlessWay
 				}
 			}
 
-			var simpleInstantiator = new SimpleInstantiator();
-			simpleInstantiator.Init(prefabsByPrototypeName);
-			_composer = new Composer(areaObjectSpecifications, simpleInstantiator, unityRandom);
+//			var simpleInstantiator = new SimpleInstantiator();
+//			simpleInstantiator.Init(prefabsByPrototypeName, 10000);
+//			_composer = new Composer(areaObjectSpecifications, simpleInstantiator, unityRandom);
+
+			_objectPoolsManager = new ObjectPoolsManager();
+			_objectPoolsManager.Init(prefabsByPrototypeName, 10000);
+			_composer = new Composer(areaObjectSpecifications, _objectPoolsManager, unityRandom);
 
 			TestAtStart();
 		}
 
 		private void TestAtStart()
 		{
-//			_allAreaObjects.AddRange(_composer.FillArea(new Vector2(-300, -100), new Vector2(300, 100), objectsParent, .9f, 5000));
-//			_allAreaObjects = _composer.ClearArea(_allAreaObjects, new Vector2(-150, -50), new Vector2(-50, 50));
-//			_allAreaObjects = _composer.ClearArea(_allAreaObjects, new Vector2(50, -50), new Vector2(150, 50));
-//			_allAreaObjects = _composer.ClearArea(_allAreaObjects, new Vector2(-50, -20), new Vector2(50, 20));
+			//			_allAreaObjects.AddRange(_composer.FillArea(new Vector2(-300, -100), new Vector2(300, 100), objectsParent, .9f, 5000));
+			//			_allAreaObjects = _composer.ClearArea(_allAreaObjects, new Vector2(-150, -50), new Vector2(-50, 50));
+			//			_allAreaObjects = _composer.ClearArea(_allAreaObjects, new Vector2(50, -50), new Vector2(150, 50));
+			//			_allAreaObjects = _composer.ClearArea(_allAreaObjects, new Vector2(-50, -20), new Vector2(50, 20));
 		}
 
 		private void TestUp()
 		{
-//			_allAreaObjects.AddRange(_composer.FillArea(new Vector2(-400, -400), new Vector2(400, 400), objectsParent, .9f, 5000));
-//			_allAreaObjects.AddRange(_composer.FillArea(new Vector2(-10, -10), new Vector2(-100, -100), objectsParent, .9f, 5000));
+			_allAreaObjects.AddRange(_composer.FillArea(new Vector2(-400, -400), new Vector2(400, 400), objectsParent, .9f, 5000));
+			_allAreaObjects.AddRange(_composer.FillArea(new Vector2(-10, -10), new Vector2(-100, -100), objectsParent, .9f, 5000));
+//			Logs.Log("+ setted={0} free={1}", _allAreaObjects.Count, _objectPoolsManager.FreeObjectsCount);
 		}
 
 		private void TestDown()
 		{
 			_composer.ClearAllObjects(_allAreaObjects);
-			_allAreaObjects.Clear(); 
-//			_allAreaObjects = _composer.ClearArea(_allAreaObjects, new Vector2(-400, -400), new Vector2(400, 400));
+			_allAreaObjects.Clear();
+//			Logs.Log("- setted={0} free={1}", _allAreaObjects.Count, _objectPoolsManager.FreeObjectsCount);
+			//			_allAreaObjects = _composer.ClearArea(_allAreaObjects, new Vector2(-400, -400), new Vector2(400, 400));
 		}
 
 
