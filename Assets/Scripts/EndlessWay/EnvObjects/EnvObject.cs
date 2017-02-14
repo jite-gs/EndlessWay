@@ -21,7 +21,7 @@ namespace EndlessWay
 
 		//=== Props ===========================================================
 
-		public bool IsWrong { get; private set; }
+		public bool IsWrong { get; protected set; }
 
 		public Vector3 Point
 		{

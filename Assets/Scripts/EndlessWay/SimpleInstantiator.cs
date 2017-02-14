@@ -1,17 +1,47 @@
+using System;
+using System.Collections.Generic;
+using DebugStuff;
 using UnityEngine;
 
 namespace EndlessWay
 {
 	public class SimpleInstantiator : IAreaObjectSource
 	{
-		public IAreaObject GetObject(string objectPrototypeName)
+		private Dictionary<string, EnvObject> _prefabsByPrototypeName;
+
+		private Type _selfType = typeof(SimpleInstantiator);
+
+
+		//=== Public ==========================================================
+
+		public void Init(Dictionary<string, EnvObject> prefabsByPrototypeName)
 		{
-			throw new System.NotImplementedException();
+			if (prefabsByPrototypeName == null)
+				throw new NullReferenceException("prefabsByPrototypeName is null");
+
+			_prefabsByPrototypeName = prefabsByPrototypeName;
 		}
 
-		public void Release(IAreaObject areaObject)
+		public IAreaObject GetObject(string objectPrototypeName, Transform parenTransform)
 		{
-			throw new System.NotImplementedException();
+			EnvObject prefabByPrototypeName;
+			if (!_prefabsByPrototypeName.TryGetValue(objectPrototypeName, out prefabByPrototypeName))
+			{
+				Logs.LogError("Not found prefabByPrototypeName '{0}'", objectPrototypeName);
+				return null;
+			}
+
+			return UnityEngine.Object.Instantiate<EnvObject>(prefabByPrototypeName, parenTransform);
+		}
+
+		public void ReleaseObject(IAreaObject areaObject)
+		{
+			var envObject = (EnvObject)areaObject;
+			if (envObject.IsNull("envObject", _selfType))
+				return;
+
+			var go = envObject.gameObject;
+			UnityEngine.Object.Destroy(go);
 		}
 	}
 }

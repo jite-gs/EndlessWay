@@ -31,7 +31,10 @@ namespace EndlessWay
 			if (meshRenderer == null)
 				meshRenderer = transform.GetComponentInChildren<MeshRenderer>();
 			if (meshRenderer.IsNull("meshRenderer", GetType()))
+			{
+				IsWrong = true;
 				return;
+			}
 
 			meshOrgPosition = meshTransform.localPosition;
 			meshOrgRotation = meshTransform.localRotation;
@@ -43,12 +46,12 @@ namespace EndlessWay
 
 		public override Vector2 GetOccupiedArea()
 		{
-			return new Vector2(MeshSize, MeshSize);
+			return IsWrong ? Vector2.one : new Vector2(meshTransform.localScale.x, meshTransform.localScale.z); //TODO Учесть и проверить ориентацию
 		}
 
 		public override void ApplyColors()
 		{
-			if (meshRenderer == null)
+			if (IsWrong)
 				return;
 
 			meshRenderer.material.SetColor("_Color", MeshColor);
@@ -56,10 +59,13 @@ namespace EndlessWay
 
 		public override void ApplySizes()
 		{
+			if (IsWrong)
+				return;
+
 			meshTransform.localScale = new Vector3(
 				meshOrgScale.x * MeshSize,
-				meshOrgScale.x * MeshSize,
-				meshOrgScale.x * MeshSize);
+				meshOrgScale.y * MeshSize,
+				meshOrgScale.z * MeshSize);
 			meshTransform.localPosition = new Vector3(
 				meshOrgPosition.x * MeshSize,
 				meshOrgPosition.y * MeshSize,

@@ -47,6 +47,7 @@ namespace EndlessWay
 			IRandom random)
 		{
 			_selfType = GetType();
+			_random = random;
 			_areaObjectSpecifications = areaObjectSpecifications;
 			_areaObjectSource = areaObjectSource;
 			if (_areaObjectSource == null || _areaObjectSpecifications == null || random == null ||
@@ -65,10 +66,12 @@ namespace EndlessWay
 		/// Возвращает список добавленных объектов
 		/// </summary>
 		/// <param name="density">Плотность заполнения площади: отношение заполненной объектами площади к общей площади</param>
-		/// <param name="parenTransform">Transform, внутри которого выставляются объекты (может быть null)</param>
+		/// <param name="parentTransform">Transform, внутри которого выставляются объекты (может быть null)</param>
+		/// <param name="maxObjects">Максимальное число выставляемых объектов</param>
 		/// <param name="height">Высота выставления объектов</param>
 		/// <returns>Список добавленных объектов</returns>
-		public List<IAreaObject> FillArea(Vector2 corner1, Vector2 corner2, float density, Transform parenTransform = null, float height = 0)
+		public List<IAreaObject> FillArea(Vector2 corner1, Vector2 corner2, Transform parentTransform,
+			float density, int maxObjects, float height = 0)
 		{
 			if (density <= 0)
 				throw new Exception("FillArea() Wrong density value: " + density);
@@ -81,45 +84,61 @@ namespace EndlessWay
 
 			var areaObjects = new List<IAreaObject>();
 			var maxFilledArea = area * density;
-			while (filledArea < maxFilledArea)
+			int objectsCount = 0;
+			while (objectsCount < maxObjects && filledArea < maxFilledArea)
 			{
 				IAreaObjectSpecification specification;
 				var areaObjectName = PickAreaObject(PickObjectStrategy.Random, out specification);
 				if (specification.IsNull("specification", _selfType))
 					break;
 
-				var areaObject = _areaObjectSource.GetObject(areaObjectName);
+				var areaObject = _areaObjectSource.GetObject(areaObjectName, parentTransform);
 				if (areaObject.IsNull("areaObject", _selfType))
 					break;
 
 				areaObject.ApplySpecification(specification);
 				if (areaObject.IsWrong)
 				{
+					_areaObjectSource.ReleaseObject(areaObject);
 					Logs.LogError("areaObject '{0}' is wrong", areaObjectName);
 					break;
 				}
 
 				Vector3 point;
-
 				if (!ChooseObjectPoint(ChooseObjectPointStrategy.BlindRandom, areaObject,
 					leftBottomCorner, rightTopCorner, height, out point))
 				{
+					_areaObjectSource.ReleaseObject(areaObject);
 					Logs.LogError("Unable to choose point for areaObject '{0}'", areaObjectName);
 					break;
 				}
 				areaObject.Point = point;
 				var occupiedAreaAsVector = areaObject.GetOccupiedArea();
 				filledArea += occupiedAreaAsVector.x * occupiedAreaAsVector.y;
+				areaObjects.Add(areaObject);
+				objectsCount++;
+				//				Logs.Log("[{0}] point={1}, AreaVector={2} ({3})",
+				//					areaObjectName, 
+				//					point,
+				//					occupiedAreaAsVector,
+				//					occupiedAreaAsVector.x * occupiedAreaAsVector.y);
 			}
 
 			return areaObjects;
 		}
 
-		public List<IAreaObject> ClearAllObjects(List<IAreaObject> areaObjectsForCheck)
+		/// <summary>
+		/// Очищает объекты из списка areaObjectsForCheck 
+		/// </summary>
+		public void ClearAllObjects(List<IAreaObject> areaObjectsForCheck)
 		{
-			return ClearObjects(areaObjectsForCheck, Vector2.zero, Vector2.one, false);
+			ClearObjects(areaObjectsForCheck, Vector2.zero, Vector2.one, false);
 		}
 
+		/// <summary>
+		/// Очищает прямоугольную площадь между точками corner1 и corner2 от объектов из списка areaObjectsForCheck.
+		/// Возвращает список оставшихся из areaObjectsForCheck
+		/// </summary>
 		public List<IAreaObject> ClearArea(List<IAreaObject> areaObjectsForCheck, Vector2 corner1, Vector2 corner2)
 		{
 			return ClearObjects(areaObjectsForCheck, corner1, corner2, true);
@@ -128,6 +147,8 @@ namespace EndlessWay
 
 		//=== Private =========================================================
 
+
+		//Приводит координаты 2 произвольных углов, описывающих прямоугольник к левому нижнему и правому верхнему углу
 		private void NormalizeCorners(Vector2 corner1, Vector2 corner2, out Vector2 leftBottomCorner, out Vector2 rightTopCorner)
 		{
 			if (Mathf.Approximately(corner1.x, corner2.x) || Mathf.Approximately(corner1.y, corner2.y))
@@ -144,7 +165,7 @@ namespace EndlessWay
 		/// </summary>
 		private List<IAreaObject> ClearObjects(List<IAreaObject> areaObjectsForCheck, Vector2 corner1, Vector2 corner2, bool byArea)
 		{
-			var restOfObjects = new List<IAreaObject>();
+			var restOfObjects = new List<IAreaObject>(areaObjectsForCheck.Capacity);
 			var objectsToRelease = areaObjectsForCheck;
 			if (byArea)
 			{
@@ -154,8 +175,8 @@ namespace EndlessWay
 
 				Bounds areaBounds = new Bounds();
 				areaBounds.SetMinMax(
-					new Vector3(leftBottomCorner.x, leftBottomCorner.y, -1),
-					new Vector3(rightTopCorner.x, rightTopCorner.y, 1));
+					new Vector3(leftBottomCorner.x,-1, leftBottomCorner.y),
+					new Vector3(rightTopCorner.x, 1, rightTopCorner.y));
 
 				for (int i = 0, len = areaObjectsForCheck.Count; i < len; i++)
 				{
@@ -173,7 +194,7 @@ namespace EndlessWay
 
 			for (int i = 0, len = objectsToRelease.Count; i < len; i++)
 			{
-				_areaObjectSource.Release(objectsToRelease[i]);
+				_areaObjectSource.ReleaseObject(objectsToRelease[i]);
 			}
 
 			return restOfObjects;
@@ -205,8 +226,8 @@ namespace EndlessWay
 				case ChooseObjectPointStrategy.BlindRandom:
 					chosenPoint = new Vector3(
 						_random.Range(leftBottomCorner.x, rightTopCorner.x),
-						_random.Range(leftBottomCorner.y, rightTopCorner.y),
-						height);
+						height,
+						_random.Range(leftBottomCorner.y, rightTopCorner.y));
 					return true;
 
 				//TODO
