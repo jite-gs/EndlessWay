@@ -14,6 +14,7 @@ namespace EndlessWay
 	{
 		public const int MaxSettedObjectsTotal = 10000;
 		public const int AreaOvermeasure = 10;
+		public const int MaxMapDistance = 5000;
 
 		private float updateTestPeriod = 1f;
 		/// <summary>
@@ -62,17 +63,18 @@ namespace EndlessWay
 
 		private Composer _composer;
 		private ObjectPoolsManager _objectPoolsManager;
-		//private List<IAreaObject> _allAreaObjects = new List<IAreaObject>(MaxSettedObjectsTotal);
 		private Queue<IAreaObject> _areaObjectsQueue = new Queue<IAreaObject>(MaxSettedObjectsTotal);
 
 		private Transform _cameraTransform;
 		private float _lastFillZ, _lastClearZ;
+		private Vector3 _cameraOrgPosition;
+
+		private Type _selfType = typeof(Main);
+		private bool _isVerbose = false;
 
 		//Tests
 		private float _lastTime;
-		private bool _isTimeToCreate = false;
-
-		private Type _selfType = typeof(Main);
+		private bool _isTimeToCreate;
 
 
 		//=== Unity ===========================================================
@@ -82,7 +84,10 @@ namespace EndlessWay
 			if (envObjectPrefabs.IsNull("envObjectPrefabs", _selfType) ||
 				specifications.IsNull("specifications", _selfType) ||
 				objectsParent.IsNull("objectsParent", _selfType))
+			{
+				enabled = false;
 				return;
+			}
 
 			int maxObjectsCountByPrototype = MaxSettedObjectsTotal / envObjectPrefabs.Length;
 			_objectInfosByPrototypeName =
@@ -146,6 +151,13 @@ namespace EndlessWay
 			_composer = new Composer(areaObjectSpecifications, _objectPoolsManager, unityRandom);
 
 			_cameraTransform = Camera.main.transform;
+			if (_cameraTransform.IsNull("_cameraTransform", _selfType))
+			{
+				enabled = false;
+				return;
+			}
+			//Запоминаем начальную позицию камеры, чтобы если далеко уедет, вернуть к ней
+			_cameraOrgPosition = _cameraTransform.localPosition;
 
 			FirstFill(_cameraTransform.localPosition.z);
 			//TestAtStart();
@@ -153,25 +165,19 @@ namespace EndlessWay
 
 		private void Update()
 		{
-			_cameraTransform.localPosition = new Vector3(
-				_cameraTransform.localPosition.x,
-				_cameraTransform.localPosition.y,
-				_cameraTransform.localPosition.z + movementSpeed * Time.deltaTime);
-
-			var newCamZ = _cameraTransform.localPosition.z;
-
+			var newCamZ = UpdateCameraPositionGetZ();
 			UpdateClear(newCamZ);
 			UpdateFill(newCamZ);
 
-			UpdateTest();
+			//UpdateTest();
 		}
 
 
 		//=== Public ==========================================================
 
-		public void OnClick() //TODO
+		public void OnExit()
 		{
-			Logs.Log("{0} Click", Time.time);
+			Application.Quit();
 		}
 
 		public void OnSlider(float val) //TODO
@@ -181,6 +187,35 @@ namespace EndlessWay
 
 
 		//=== Private =========================================================
+
+		private float UpdateCameraPositionGetZ()
+		{
+			if (_cameraTransform.localPosition.z > MaxMapDistance)
+			{
+				MoveCameraAndObjectsToCenter();
+			}
+
+			_cameraTransform.localPosition = new Vector3(
+				_cameraTransform.localPosition.x,
+				_cameraTransform.localPosition.y,
+				_cameraTransform.localPosition.z + movementSpeed * Time.deltaTime);
+
+			return _cameraTransform.localPosition.z;
+		}
+
+		private void MoveCameraAndObjectsToCenter()
+		{
+			var backToCenter = _cameraOrgPosition - _cameraTransform.localPosition;
+			_cameraTransform.localPosition = _cameraOrgPosition;
+			foreach (var areaObject in _areaObjectsQueue)
+			{
+				areaObject.Point = areaObject.Point + backToCenter;
+			}
+			_lastClearZ += backToCenter.z;
+			_lastFillZ += backToCenter.z;
+			if (_isVerbose)
+				Logs.Log("MoveCameraAndObjectsToCenter() vector={0}, newCamPos={1}", backToCenter, _cameraTransform.localPosition);
+		}
 
 		private void FirstFill(float currentCamZ)
 		{
@@ -238,8 +273,10 @@ namespace EndlessWay
 				}
 				newObjectsCount += newObjects.Count;
 			}
-			Logs.Log("FillArea(nearZ={0:f0}, farZ={1:f0}, fillWidth={2:f0}, emptyWidth={3:f0}) Objects: onScene={4} new={5}  inPools={6}",
-				nearZ, farZ, fillWdt, centerEmptySpaceWdt, _areaObjectsQueue.Count, newObjectsCount, _objectPoolsManager.FreeObjectsCount);
+			if (_isVerbose)
+				Logs.Log(
+					"FillArea(nearZ={0:f0}, farZ={1:f0}, fillWidth={2:f0}, emptyWidth={3:f0}) Objects: onScene={4} new={5}  inPools={6}",
+					nearZ, farZ, fillWdt, centerEmptySpaceWdt, _areaObjectsQueue.Count, newObjectsCount, _objectPoolsManager.FreeObjectsCount);
 		}
 
 		private void UpdateClear(float currentCamZ)
@@ -258,14 +295,17 @@ namespace EndlessWay
 			}
 			_composer.ClearObjects(areaObjectsToClear);
 
-			if (areaObjectsToClear.Count == 0)
+			if (_isVerbose)
 			{
-				Logs.Log("UpdateClear(currentCamZ={0:f0}) none", currentCamZ);
-			}
-			else
-			{
-				Logs.Log("UpdateClear(currentCamZ={0:f0}) cleared={1} onScene={2}  inPools={3}",
-					currentCamZ, areaObjectsToClear.Count, _areaObjectsQueue.Count, _objectPoolsManager.FreeObjectsCount);
+				if (areaObjectsToClear.Count == 0)
+				{
+					Logs.Log("UpdateClear(currentCamZ={0:f0}) none", currentCamZ);
+				}
+				else
+				{
+					Logs.Log("UpdateClear(currentCamZ={0:f0}) cleared={1} onScene={2}  inPools={3}",
+						currentCamZ, areaObjectsToClear.Count, _areaObjectsQueue.Count, _objectPoolsManager.FreeObjectsCount);
+				}
 			}
 		}
 
@@ -281,35 +321,14 @@ namespace EndlessWay
 
 			if (_isTimeToCreate)
 			{
-				TestUp();
 			}
 			else
 			{
-				TestDown();
 			}
 		}
 
 		private void TestAtStart()
 		{
-			//			
-			//			_allAreaObjects = _composer.ClearArea(_allAreaObjects, new Vector2(-150, -50), new Vector2(-50, 50));
-			//			_allAreaObjects = _composer.ClearArea(_allAreaObjects, new Vector2(50, -50), new Vector2(150, 50));
-			//			_allAreaObjects = _composer.ClearArea(_allAreaObjects, new Vector2(-50, -20), new Vector2(50, 20));
-		}
-
-		private void TestUp()
-		{
-			//			_allAreaObjects.AddRange(_composer.FillArea(new Vector2(-400, -400), new Vector2(400, 400), objectsParent, .9f, 5000));
-			//			_allAreaObjects.AddRange(_composer.FillArea(new Vector2(-10, -10), new Vector2(-100, -100), objectsParent, .9f, 5000));
-			//			Logs.Log("+ setted={0} free={1}", _allAreaObjects.Count, _objectPoolsManager.FreeObjectsCount);
-		}
-
-		private void TestDown()
-		{
-			//			_composer.ClearObjects(_allAreaObjects);
-			//			_allAreaObjects.Clear();
-			//			Logs.Log("- setted={0} free={1}", _allAreaObjects.Count, _objectPoolsManager.FreeObjectsCount);
-			//			_allAreaObjects = _composer.ClearArea(_allAreaObjects, new Vector2(-400, -400), new Vector2(400, 400));
 		}
 
 	}
