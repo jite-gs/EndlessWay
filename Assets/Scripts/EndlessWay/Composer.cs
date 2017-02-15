@@ -130,9 +130,9 @@ namespace EndlessWay
 		/// <summary>
 		/// Очищает объекты из списка areaObjectsForCheck 
 		/// </summary>
-		public void ClearAllObjects(List<IAreaObject> areaObjectsForCheck)
+		public void ClearObjects(List<IAreaObject> areaObjectsForCheck)
 		{
-			ClearObjects(areaObjectsForCheck, Vector2.zero, Vector2.one, false);
+			ClearObjectsWork(areaObjectsForCheck, Vector2.zero, Vector2.zero, false);
 		}
 
 		/// <summary>
@@ -141,7 +141,7 @@ namespace EndlessWay
 		/// </summary>
 		public List<IAreaObject> ClearArea(List<IAreaObject> areaObjectsForCheck, Vector2 corner1, Vector2 corner2)
 		{
-			return ClearObjects(areaObjectsForCheck, corner1, corner2, true);
+			return ClearObjectsWork(areaObjectsForCheck, corner1, corner2, true);
 		}
 
 
@@ -163,7 +163,7 @@ namespace EndlessWay
 		/// Очищает объекты с территории ограниченной corner1 и corner1 (расчеты ведутся в local-координатах объектов) 
 		/// или вообще объекты из areaObjectsForCheck, если byArea false. Возвращает список оставшихся из areaObjectsForCheck
 		/// </summary>
-		private List<IAreaObject> ClearObjects(List<IAreaObject> areaObjectsForCheck, Vector2 corner1, Vector2 corner2, bool byArea)
+		private List<IAreaObject> ClearObjectsWork(List<IAreaObject> areaObjectsForCheck, Vector2 corner1, Vector2 corner2, bool byArea)
 		{
 			var restOfObjects = new List<IAreaObject>(areaObjectsForCheck.Capacity);
 			var objectsToRelease = areaObjectsForCheck;

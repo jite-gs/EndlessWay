@@ -88,5 +88,13 @@ namespace DebugStuff
 			return sb.ToString();
 		}
 
+
+		//=== Bool ============================================================
+
+		public static string AsSign(this bool b)
+		{
+			return b ? "+" : "-";
+		}
+
 	}
 }

@@ -10,7 +10,7 @@ namespace EndlessWay
 		private List<T> _pool;
 		private T _prefab;
 
-		private bool _isVerbose = false;
+		private bool _isVerbose = true;
 
 		private Type _selfType;
 
@@ -49,8 +49,9 @@ namespace EndlessWay
 
 			if (ObjectsCount < MaxObjects)
 				return CreateNewObject(parentTransform);
+
 			if (_isVerbose)
-				Logs.Log("GetObject() maxObjects limit={0}", MaxObjects); //DEBUG
+				Logs.Log("GetObject() Return null cause maxObjects limit={0}", MaxObjects); //DEBUG
 			return null;
 		}
 
@@ -67,7 +68,7 @@ namespace EndlessWay
 			_pool.RemoveAt(objectIndex);
 			if (freeObject == null)
 			{
-				Logs.LogError("<{0}> GetFreeObject() freeObject[{1}] is null", _selfType.NiceName(), objectIndex);
+				Logs.LogError("<{0}>({1}) GetFreeObject() freeObject[{2}] is null", _selfType.NiceName(), _prefab.name, objectIndex);
 			}
 			else
 			{
@@ -86,7 +87,12 @@ namespace EndlessWay
 
 		public void Release(T objectToRelease)
 		{
-			objectToRelease.IsNull("objectToRelease", _selfType);
+			if (objectToRelease == null)
+			{
+				Logs.LogError("<{0}>({1}) Release() object is null", _selfType.NiceName(), _prefab.name);
+				return;
+			}
+
 			_pool.Add(objectToRelease);
 		}
 	}
