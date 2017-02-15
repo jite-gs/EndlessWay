@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using DebugStuff;
 using SomeRandom;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace EndlessWay
@@ -16,7 +17,8 @@ namespace EndlessWay
 		public const int AreaOvermeasure = 10;
 		public const int MaxMapDistance = 5000;
 
-		private float updateTestPeriod = 1f;
+		public bool isVerbose = false;
+
 		/// <summary>
 		/// Плотность заполнения объектами
 		/// </summary>
@@ -52,6 +54,8 @@ namespace EndlessWay
 		/// </summary>
 		public float areaClearInterval = 10;
 
+		public float testUpdatePeriod = 1f;
+
 		public Transform objectsParent;
 		public EnvObject[] envObjectPrefabs;
 		public EnvObjectSpecification[] specifications;
@@ -69,8 +73,9 @@ namespace EndlessWay
 		private float _lastFillZ, _lastClearZ;
 		private Vector3 _cameraOrgPosition;
 
+		private ControlsStorage _controlsStorage;
+
 		private Type _selfType = typeof(Main);
-		private bool _isVerbose = false;
 
 		//Tests
 		private float _lastTime;
@@ -81,9 +86,11 @@ namespace EndlessWay
 
 		private void Start()
 		{
+			_controlsStorage = FindObjectOfType<ControlsStorage>();
 			if (envObjectPrefabs.IsNull("envObjectPrefabs", _selfType) ||
 				specifications.IsNull("specifications", _selfType) ||
-				objectsParent.IsNull("objectsParent", _selfType))
+				objectsParent.IsNull("objectsParent", _selfType) ||
+				_controlsStorage.IsNull("_controlsStorage", _selfType))
 			{
 				enabled = false;
 				return;
@@ -160,7 +167,7 @@ namespace EndlessWay
 			_cameraOrgPosition = _cameraTransform.localPosition;
 
 			FirstFill(_cameraTransform.localPosition.z);
-			//TestAtStart();
+			TestAtStart();
 		}
 
 		private void Update()
@@ -180,9 +187,9 @@ namespace EndlessWay
 			Application.Quit();
 		}
 
-		public void OnSlider(float val) //TODO
+		public void OnSliderSpeed()
 		{
-
+			movementSpeed = _controlsStorage.MovementSpeed;
 		}
 
 
@@ -213,7 +220,7 @@ namespace EndlessWay
 			}
 			_lastClearZ += backToCenter.z;
 			_lastFillZ += backToCenter.z;
-			if (_isVerbose)
+			if (isVerbose)
 				Logs.Log("MoveCameraAndObjectsToCenter() vector={0}, newCamPos={1}", backToCenter, _cameraTransform.localPosition);
 		}
 
@@ -273,7 +280,7 @@ namespace EndlessWay
 				}
 				newObjectsCount += newObjects.Count;
 			}
-			if (_isVerbose)
+			if (isVerbose)
 				Logs.Log(
 					"FillArea(nearZ={0:f0}, farZ={1:f0}, fillWidth={2:f0}, emptyWidth={3:f0}) Objects: onScene={4} new={5}  inPools={6}",
 					nearZ, farZ, fillWdt, centerEmptySpaceWdt, _areaObjectsQueue.Count, newObjectsCount, _objectPoolsManager.FreeObjectsCount);
@@ -295,7 +302,7 @@ namespace EndlessWay
 			}
 			_composer.ClearObjects(areaObjectsToClear);
 
-			if (_isVerbose)
+			if (isVerbose)
 			{
 				if (areaObjectsToClear.Count == 0)
 				{
@@ -312,7 +319,7 @@ namespace EndlessWay
 		private void UpdateTest()
 		{
 			var newTime = Time.time;
-			if (newTime - _lastTime < updateTestPeriod)
+			if (newTime - _lastTime < testUpdatePeriod)
 				return;
 
 			_lastTime = newTime;
@@ -327,8 +334,15 @@ namespace EndlessWay
 			}
 		}
 
+		//		private EventSystem _eventSystem;
 		private void TestAtStart()
 		{
+			//			_eventSystem = FindObjectOfType<EventSystem>();
+			//			if (_eventSystem.IsNull("_eventSystem", _selfType))
+			//				return;
+			//
+			//			Logs.Log("currentSelectedGameObject {0}", _eventSystem.currentSelectedGameObject.VarDump());
+
 		}
 
 	}
