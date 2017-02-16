@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace EndlessWay
 {
-	public class EnvObject : MonoBehaviour, IAreaObject
+	public abstract class EnvObject : MonoBehaviour, IAreaObject
 	{
 		/// <summary>
 		/// Цвета объекта
@@ -16,7 +16,11 @@ namespace EndlessWay
 		/// </summary>
 		public float[] sizes;
 
-		private static Type _selfType = typeof(EnvObject);
+		protected Vector3 orgPosition;
+		protected Vector3 orgScale;
+		protected Quaternion orgRotation;
+
+		private static Type _selfType;
 
 
 		//=== Props ===========================================================
@@ -27,6 +31,19 @@ namespace EndlessWay
 		{
 			get { return transform.localPosition; }
 			set { transform.localPosition = value; }
+		}
+
+		protected float MainSize { get { return sizes == null ? 1 : sizes[0]; } }
+
+		protected Color MainColor { get { return colors == null ? Color.black : colors[0]; } }
+
+
+		//=== Unty ============================================================
+
+		private void Awake()
+		{
+			if (_selfType == null)
+				_selfType = GetType();
 		}
 
 
@@ -53,19 +70,10 @@ namespace EndlessWay
 			}
 		}
 
-		public virtual Vector2 GetOccupiedArea()
-		{
-			return Vector3.zero;
-		}
+		public abstract Vector2 GetOccupiedArea();
 
-		public virtual void ApplySizes()
-		{
+		public abstract void ApplySizes();
 
-		}
-
-		public virtual void ApplyColors()
-		{
-
-		}
+		public abstract void ApplyColors();
 	}
 }

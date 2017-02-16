@@ -3,9 +3,9 @@ using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
-/// ���������� value ��������.
-/// �������� �� ��������� � ����������� Text ������ Slider (��� ��������� ���������� Text � Slider �������), 
-/// ����� ������� �� �������� ������ �� ����� ������������
+/// Показывает value слайдера
+/// Навесить на трансформ с компонентом Text, находящимся внутри Slider (или вручную указать поля slider и text)
+/// На компоненте Slider в разделе OnValueChanged сделать ссылку на метод OnSliderValueChanged данного компонента
 /// </summary>
 public class SliderValueText : MonoBehaviour
 {

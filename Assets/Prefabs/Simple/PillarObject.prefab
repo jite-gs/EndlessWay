@@ -19,7 +19,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4341498966382704}
-  - component: {fileID: 114930824864790672}
+  - component: {fileID: 114935826370864998}
   m_Layer: 0
   m_Name: PillarObject
   m_TagString: Untagged
@@ -109,7 +109,7 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1351911770683926}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!114 &114930824864790672
+--- !u!114 &114935826370864998
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -117,7 +117,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1004388567901668}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3741afbba48447942b01094f797bf77c, type: 3}
+  m_Script: {fileID: 11500000, guid: 6e8260f8bb67f1c479a5798668a6c6b9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   colors: []

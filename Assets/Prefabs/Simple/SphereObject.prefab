@@ -19,7 +19,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4286261378086728}
-  - component: {fileID: 114425880851839928}
+  - component: {fileID: 114079880970676850}
   m_Layer: 0
   m_Name: SphereObject
   m_TagString: Untagged
@@ -109,7 +109,7 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1921082478624864}
   m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
---- !u!114 &114425880851839928
+--- !u!114 &114079880970676850
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -117,7 +117,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1218786715253828}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6c77091f38c6f7047af019efc06e87a5, type: 3}
+  m_Script: {fileID: 11500000, guid: 6e8260f8bb67f1c479a5798668a6c6b9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   colors: []

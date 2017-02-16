@@ -19,7 +19,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4468121183143918}
-  - component: {fileID: 114409518561742500}
+  - component: {fileID: 114282709086713382}
   m_Layer: 0
   m_Name: CubeObject
   m_TagString: Untagged
@@ -109,7 +109,7 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1360046659549226}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!114 &114409518561742500
+--- !u!114 &114282709086713382
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -117,7 +117,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1260033239180366}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aab160cd7c75dcf44b2423a409f32442, type: 3}
+  m_Script: {fileID: 11500000, guid: 6e8260f8bb67f1c479a5798668a6c6b9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   colors: []

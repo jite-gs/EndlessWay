@@ -37,7 +37,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.43748903, g: 0.48531294, b: 0.56558704, a: 1}
+  m_IndirectSpecularColor: {r: 0.44266927, g: 0.49179143, b: 0.5715947, a: 1}
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
@@ -1582,13 +1582,13 @@ Transform:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 718523079}
-  m_LocalRotation: {x: 0.6403416, y: 0.06676521, z: -0.05602265, w: 0.7631295}
+  m_LocalRotation: {x: 0.48615146, y: -0.24549983, z: 0.14446622, w: 0.82614535}
   m_LocalPosition: {x: 0, y: 3, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 80, y: 10, z: 0}
+  m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 60.95, y: -33.1, z: 0}
 --- !u!1 &724325290
 GameObject:
   m_ObjectHideFlags: 0
@@ -2233,7 +2233,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 4294967295
   m_IsActive: 1
 --- !u!23 &1186416988
 MeshRenderer:
@@ -2294,8 +2294,8 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1186416987}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 6000, y: 0.1, z: 6000}
+  m_LocalPosition: {x: 0, y: 0, z: 4000}
+  m_LocalScale: {x: 800, y: 0.1, z: 900}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 2
@@ -3135,10 +3135,11 @@ MonoBehaviour:
   testUpdatePeriod: 1
   objectsParent: {fileID: 1225082103}
   envObjectPrefabs:
-  - {fileID: 114409518561742500, guid: ef5e66b679cfda9499d6111325cd099e, type: 2}
-  - {fileID: 114409518561742500, guid: 4eea2683a19f8cc4899cc9e70cefa4ed, type: 2}
-  - {fileID: 114930824864790672, guid: 21e9b3cf614452f4b8106d05147cbd97, type: 2}
-  - {fileID: 114425880851839928, guid: 49e50f5fad47ea44ebf10fd437ef2582, type: 2}
+  - {fileID: 114282709086713382, guid: ef5e66b679cfda9499d6111325cd099e, type: 2}
+  - {fileID: 114374543772427150, guid: 4eea2683a19f8cc4899cc9e70cefa4ed, type: 2}
+  - {fileID: 114935826370864998, guid: 21e9b3cf614452f4b8106d05147cbd97, type: 2}
+  - {fileID: 114079880970676850, guid: 49e50f5fad47ea44ebf10fd437ef2582, type: 2}
+  - {fileID: 114158826857227910, guid: 22d22741719d2014aa5280acf710fa10, type: 2}
   specifications:
   - associatedEnvObjectName: CubeObject
     colorsLength: 1
@@ -3155,18 +3156,30 @@ MonoBehaviour:
       hiSize: 2
   - associatedEnvObjectName: CubeObjectBuilding
     colorsLength: 1
-    sizesLength: 0
+    sizesLength: 1
     colorRanges:
     - isFixedColors: 0
       fixedColors: []
-      loColor: {r: 0.375, g: 0.375, b: 0.375, a: 1}
-      hiColor: {r: 0.6764706, g: 0.6764706, b: 0.6764706, a: 1}
-    sizeRanges: []
+      loColor: {r: 0.64852935, g: 0.7205882, b: 0.6305147, a: 1}
+      hiColor: {r: 0.41287136, g: 0.46323532, b: 0.23502381, a: 1}
+    sizeRanges:
+    - isFixedSizes: 0
+      fixedSizes: []
+      loSize: 1
+      hiSize: 2
   - associatedEnvObjectName: PillarObject
-    colorsLength: 0
-    sizesLength: 0
-    colorRanges: []
-    sizeRanges: []
+    colorsLength: 1
+    sizesLength: 1
+    colorRanges:
+    - isFixedColors: 0
+      fixedColors: []
+      loColor: {r: 0.74264705, g: 0.6478955, b: 0.3385597, a: 1}
+      hiColor: {r: 0.78676474, g: 0.46559557, b: 0.121485755, a: 1}
+    sizeRanges:
+    - isFixedSizes: 0
+      fixedSizes: []
+      loSize: 1
+      hiSize: 3
   - associatedEnvObjectName: SphereObject
     colorsLength: 1
     sizesLength: 1
@@ -3183,7 +3196,20 @@ MonoBehaviour:
     - isFixedSizes: 0
       fixedSizes: []
       loSize: 1
-      hiSize: 10
+      hiSize: 4
+  - associatedEnvObjectName: PortalObject
+    colorsLength: 1
+    sizesLength: 1
+    colorRanges:
+    - isFixedColors: 0
+      fixedColors: []
+      loColor: {r: 0.285359, g: 0.36740395, b: 0.6691177, a: 0.615}
+      hiColor: {r: 0.44852942, g: 0.1908752, b: 0.13192041, a: 1}
+    sizeRanges:
+    - isFixedSizes: 0
+      fixedSizes: []
+      loSize: 1
+      hiSize: 3
 --- !u!4 &1687563865
 Transform:
   m_ObjectHideFlags: 0
@@ -3195,7 +3221,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1739920864
 GameObject:
