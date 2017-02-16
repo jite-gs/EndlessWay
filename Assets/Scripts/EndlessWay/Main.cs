@@ -324,6 +324,10 @@ namespace EndlessWay
 				}
 				newObjectsCount += newObjects.Count;
 			}
+
+			if (newObjectsCount > 0)
+				_controlsManager.SetObjectsCount(_areaObjectsQueue.Count, _areaObjectSource.FreeObjectsCount);
+
 			if (isVerbose)
 				Logs.Log(
 					"FillArea(nearZ={0:f0}, farZ={1:f0}, fillWidth={2:f0}, emptyWidth={3:f0}) Objects: onScene={4} new={5}  inPools={6}",
@@ -345,6 +349,11 @@ namespace EndlessWay
 				areaObject = _areaObjectsQueue.Peek();
 			}
 			_composer.ClearObjects(areaObjectsToClear);
+
+			if (areaObjectsToClear.Count > 0)
+			{
+				_controlsManager.SetObjectsCount(_areaObjectsQueue.Count, _areaObjectSource.FreeObjectsCount);
+			}
 
 			if (isVerbose)
 			{

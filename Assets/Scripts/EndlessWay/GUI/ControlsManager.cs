@@ -7,12 +7,16 @@ namespace EndlessWay
 {
 	public class ControlsManager : MonoBehaviour
 	{
+		public Canvas canvasControls;
+		public Canvas canvasActivator;
+
 		public Slider sliderMovementSpeed;
 		public Slider sliderDensity;
 		public Slider sliderFirstFillMaxObjects;
 
-		public Canvas canvasControls;
-		public Canvas canvasActivator;
+		public Text textSceneObjects;
+		public Text textFreeObjects;
+		private int _lastSceneObjectsCount, _lastFreeObjectsCount;
 
 		public event Action<IntParamChangedEventArgs> IntParamChangedEvent;
 		public event Action<FloatParamChangedEventArgs> FloatParamChangedEvent;
@@ -25,6 +29,8 @@ namespace EndlessWay
 			MovementSpeed,
 			FirstFillMaxObjects,
 			FillDensity,
+			SceneObjectsCount,
+			FreeObjectsCount,
 		}
 
 
@@ -41,6 +47,8 @@ namespace EndlessWay
 
 			if (canvasControls.IsNull("canvasControls", selfType) ||
 				canvasActivator.IsNull("canvasActivator", selfType) ||
+				textSceneObjects.IsNull("textSceneObjects", selfType) ||
+				textFreeObjects.IsNull("textFreeObjects", selfType) ||
 				sliderMovementSpeed.IsNull("sliderMovementSpeed", selfType) ||
 				sliderDensity.IsNull("sliderDensity", selfType) ||
 				sliderFirstFillMaxObjects.IsNull("sliderFirstFillMaxObjects", selfType))
@@ -110,6 +118,21 @@ namespace EndlessWay
 				default:
 					Logs.LogError("<{0}> SetSliderValue() Unhandled ParamName.{1}", GetType(), args.ParamName);
 					break;
+			}
+		}
+
+		public void SetObjectsCount(int newSceneObjectsCount, int newFreeObjectsCount)
+		{
+			if (_lastSceneObjectsCount != newSceneObjectsCount)
+			{
+				_lastSceneObjectsCount = newSceneObjectsCount;
+				textSceneObjects.text = newSceneObjectsCount.ToString();
+			}
+
+			if (_lastFreeObjectsCount != newFreeObjectsCount)
+			{
+				_lastFreeObjectsCount = newFreeObjectsCount;
+				textFreeObjects.text = newFreeObjectsCount.ToString();
 			}
 		}
 
