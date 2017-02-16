@@ -63,8 +63,8 @@ namespace EndlessWay
 
 		public void OnClickShowControls()
 		{
-			canvasControls.enabled = true;
 			canvasActivator.enabled = false;
+			canvasControls.enabled = true;
 		}
 
 		public void OnClickHideControls()
