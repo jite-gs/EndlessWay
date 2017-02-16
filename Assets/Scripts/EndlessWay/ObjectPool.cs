@@ -10,7 +10,7 @@ namespace EndlessWay
 		private List<T> _pool;
 		private T _prefab;
 
-		private bool _isVerbose = true;
+		private bool _isVerbose = false;
 
 		private Type _selfType;
 

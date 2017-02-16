@@ -12,6 +12,11 @@ namespace EndlessWay
 		private Type _selfType = typeof(SimpleInstantiator);
 
 
+		//=== Props ===========================================================
+
+		public int FreeObjectsCount { get { return 0; } }
+
+
 		//=== Public ==========================================================
 
 		public void Init(Dictionary<string, EnvObject> prefabsByPrototypeName, int maxObjectsByPrototype)

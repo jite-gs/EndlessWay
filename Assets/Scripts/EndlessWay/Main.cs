@@ -66,14 +66,14 @@ namespace EndlessWay
 		private Dictionary<string, KeyValuePair<EnvObject, EnvObjectSpecification>> _objectInfosByPrototypeName;
 
 		private Composer _composer;
-		private ObjectPoolsManager _objectPoolsManager;
+		private IAreaObjectSource _areaObjectSource;
 		private Queue<IAreaObject> _areaObjectsQueue = new Queue<IAreaObject>(MaxSettedObjectsTotal);
 
 		private Transform _cameraTransform;
 		private float _lastFillZ, _lastClearZ;
 		private Vector3 _cameraOrgPosition;
 
-		private ControlsStorage _controlsStorage;
+		private ControlsManager _controlsManager;
 
 		private Type _selfType = typeof(Main);
 
@@ -86,53 +86,28 @@ namespace EndlessWay
 
 		private void Start()
 		{
-			_controlsStorage = FindObjectOfType<ControlsStorage>();
+			_controlsManager = FindObjectOfType<ControlsManager>();
 			if (envObjectPrefabs.IsNull("envObjectPrefabs", _selfType) ||
 				specifications.IsNull("specifications", _selfType) ||
 				objectsParent.IsNull("objectsParent", _selfType) ||
-				_controlsStorage.IsNull("_controlsStorage", _selfType))
+				_controlsManager.IsNull("_controlsManager", _selfType) ||
+				_controlsManager.IsWrong)
 			{
 				enabled = false;
 				return;
 			}
 
-			int maxObjectsCountByPrototype = MaxSettedObjectsTotal / envObjectPrefabs.Length;
-			_objectInfosByPrototypeName =
-				new Dictionary<string, KeyValuePair<EnvObject, EnvObjectSpecification>>(maxObjectsCountByPrototype);
-			for (int i = 0, len = envObjectPrefabs.Length; i < len; i++)
-			{
-				var envObject = envObjectPrefabs[i];
-				if (envObject.IsNull("envObjectPrefabs[" + i + "]", _selfType))
-					continue;
-
-				if (_objectInfosByPrototypeName.ContainsKey(envObject.name))
-				{
-					Logs.LogError("_objectInfosByPrototypeName already contains envObject with name '{0}'", envObject.name);
-					continue;
-				}
-
-				_objectInfosByPrototypeName.Add(envObject.name, new KeyValuePair<EnvObject, EnvObjectSpecification>(envObject, null));
-			}
+			_controlsManager.IntParamChangedEvent += OnIntParamChanged;
+			_controlsManager.FloatParamChangedEvent += OnFloatParamChanged;
+			_controlsManager.SetSliderValue(new FloatParamChangedEventArgs(ControlsManager.ParamName.MovementSpeed, movementSpeed));
+			_controlsManager.SetSliderValue(new FloatParamChangedEventArgs(ControlsManager.ParamName.FillDensity, density));
+			_controlsManager.SetSliderValue(new FloatParamChangedEventArgs(ControlsManager.ParamName.FirstFillMaxObjects, firstFillMaxObjects));
 
 			var unityRandom = new UnityRandom();
-			for (int i = 0, len = specifications.Length; i < len; i++)
-			{
-				var specification = specifications[i];
-				if (specification.IsNull("specification[" + i + "]", _selfType) ||
-					!specification.Init(unityRandom))
-					continue;
+			int maxObjectsCountByPrototype = MaxSettedObjectsTotal / envObjectPrefabs.Length;
 
-				KeyValuePair<EnvObject, EnvObjectSpecification> kvp;
-				if (!_objectInfosByPrototypeName.TryGetValue(specification.associatedEnvObjectName, out kvp))
-				{
-					Logs.LogError("_objectInfosByPrototypeName don't contains envObject '{0}' for specification[{0}]",
-						specification.associatedEnvObjectName, i);
-					continue;
-				}
-
-				_objectInfosByPrototypeName[specification.associatedEnvObjectName] =
-					new KeyValuePair<EnvObject, EnvObjectSpecification>(kvp.Key, specification);
-			}
+			_objectInfosByPrototypeName = GetObjectInfosByPrototypeName(
+				envObjectPrefabs, specifications, unityRandom, maxObjectsCountByPrototype);
 
 			var areaObjectSpecifications = new Dictionary<string, IAreaObjectSpecification>();
 			var prefabsByPrototypeName = new Dictionary<string, EnvObject>();
@@ -149,13 +124,10 @@ namespace EndlessWay
 				}
 			}
 
-			//			var simpleInstantiator = new SimpleInstantiator();
-			//			simpleInstantiator.Init(prefabsByPrototypeName, 10000);
-			//			_composer = new Composer(areaObjectSpecifications, simpleInstantiator, unityRandom);
-
-			_objectPoolsManager = new ObjectPoolsManager(Vector3.up * 100 + Vector3.back * 100);
-			_objectPoolsManager.Init(prefabsByPrototypeName, maxObjectsCountByPrototype);
-			_composer = new Composer(areaObjectSpecifications, _objectPoolsManager, unityRandom);
+			//_areaObjectSource = new SimpleInstantiator();
+			_areaObjectSource = new ObjectPoolsManager(Vector3.up * 100 + Vector3.back * 100);
+			_areaObjectSource.Init(prefabsByPrototypeName, maxObjectsCountByPrototype);
+			_composer = new Composer(areaObjectSpecifications, _areaObjectSource, unityRandom);
 
 			_cameraTransform = Camera.main.transform;
 			if (_cameraTransform.IsNull("_cameraTransform", _selfType))
@@ -170,6 +142,15 @@ namespace EndlessWay
 			TestAtStart();
 		}
 
+		private void OnDestroy()
+		{
+			if (_controlsManager != null)
+			{
+				_controlsManager.IntParamChangedEvent -= OnIntParamChanged;
+				_controlsManager.FloatParamChangedEvent -= OnFloatParamChanged;
+			}
+		}
+
 		private void Update()
 		{
 			var newCamZ = UpdateCameraPositionGetZ();
@@ -182,18 +163,81 @@ namespace EndlessWay
 
 		//=== Public ==========================================================
 
-		public void OnExit()
+		private void OnIntParamChanged(IntParamChangedEventArgs eventArgs)
 		{
-			Application.Quit();
+			switch (eventArgs.ParamName)
+			{
+				case ControlsManager.ParamName.FirstFillMaxObjects:
+					firstFillMaxObjects = eventArgs.ParamValue;
+					break;
+
+				default:
+					Logs.LogError("OnIntParamChanged() Unhandled ParamName={0}", eventArgs.ParamName);
+					break;
+			}
 		}
 
-		public void OnSliderSpeed()
+		private void OnFloatParamChanged(FloatParamChangedEventArgs eventArgs)
 		{
-			movementSpeed = _controlsStorage.MovementSpeed;
+			switch (eventArgs.ParamName)
+			{
+				case ControlsManager.ParamName.MovementSpeed:
+					movementSpeed = eventArgs.ParamValue;
+					break;
+
+				case ControlsManager.ParamName.FillDensity:
+					density = eventArgs.ParamValue;
+					break;
+
+				default:
+					Logs.LogError("OnFloatParamChanged() Unhandled ParamName={0}", eventArgs.ParamName);
+					break;
+			}
 		}
 
 
 		//=== Private =========================================================
+
+		private Dictionary<string, KeyValuePair<EnvObject, EnvObjectSpecification>> GetObjectInfosByPrototypeName(
+			EnvObject[] prefabs, EnvObjectSpecification[] specs, IRandom random, int maxObjectsCountByPrototype)
+		{
+			var objectInfosByPrototypeName =
+				new Dictionary<string, KeyValuePair<EnvObject, EnvObjectSpecification>>(maxObjectsCountByPrototype);
+			for (int i = 0, len = prefabs.Length; i < len; i++)
+			{
+				var envObject = prefabs[i];
+				if (envObject.IsNull("prefabs[" + i + "]", _selfType))
+					continue;
+
+				if (objectInfosByPrototypeName.ContainsKey(envObject.name))
+				{
+					Logs.LogError("objectInfosByPrototypeName already contains envObject with name '{0}'", envObject.name);
+					continue;
+				}
+
+				objectInfosByPrototypeName.Add(envObject.name, new KeyValuePair<EnvObject, EnvObjectSpecification>(envObject, null));
+			}
+
+			for (int i = 0, len = specs.Length; i < len; i++)
+			{
+				var specification = specs[i];
+				if (specification.IsNull("specification[" + i + "]", _selfType) ||
+					!specification.Init(random))
+					continue;
+
+				KeyValuePair<EnvObject, EnvObjectSpecification> kvp;
+				if (!objectInfosByPrototypeName.TryGetValue(specification.associatedEnvObjectName, out kvp))
+				{
+					Logs.LogError("objectInfosByPrototypeName don't contains envObject '{0}' for specification[{0}]",
+						specification.associatedEnvObjectName, i);
+					continue;
+				}
+
+				objectInfosByPrototypeName[specification.associatedEnvObjectName] =
+					new KeyValuePair<EnvObject, EnvObjectSpecification>(kvp.Key, specification);
+			}
+			return objectInfosByPrototypeName;
+		}
 
 		private float UpdateCameraPositionGetZ()
 		{
@@ -283,7 +327,7 @@ namespace EndlessWay
 			if (isVerbose)
 				Logs.Log(
 					"FillArea(nearZ={0:f0}, farZ={1:f0}, fillWidth={2:f0}, emptyWidth={3:f0}) Objects: onScene={4} new={5}  inPools={6}",
-					nearZ, farZ, fillWdt, centerEmptySpaceWdt, _areaObjectsQueue.Count, newObjectsCount, _objectPoolsManager.FreeObjectsCount);
+					nearZ, farZ, fillWdt, centerEmptySpaceWdt, _areaObjectsQueue.Count, newObjectsCount, _areaObjectSource.FreeObjectsCount);
 		}
 
 		private void UpdateClear(float currentCamZ)
@@ -311,7 +355,7 @@ namespace EndlessWay
 				else
 				{
 					Logs.Log("UpdateClear(currentCamZ={0:f0}) cleared={1} onScene={2}  inPools={3}",
-						currentCamZ, areaObjectsToClear.Count, _areaObjectsQueue.Count, _objectPoolsManager.FreeObjectsCount);
+						currentCamZ, areaObjectsToClear.Count, _areaObjectsQueue.Count, _areaObjectSource.FreeObjectsCount);
 				}
 			}
 		}

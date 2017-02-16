@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using UnityEngine;
 
 namespace DebugStuff
 {
@@ -94,6 +95,44 @@ namespace DebugStuff
 		public static string AsSign(this bool b)
 		{
 			return b ? "+" : "-";
+		}
+
+
+		//=== Unity ===========================================================
+
+		/// <summary>
+		/// ���������� ������ ������� ���� � ����������
+		/// </summary>
+		public static string FullName(this Transform tr)
+		{
+			if (tr == null)
+				return "(null)";
+
+			string trName = tr.name;
+			Transform trParent = tr.parent;
+			while (trParent != null)
+			{
+				trName = trParent.name + "/" + trName;
+				trParent = trParent.parent;
+			}
+			return trName;
+		}
+
+		/// <summary>
+		/// ���������� ������ ��������� ��������� T �� �������� ��� ��������� ����
+		/// </summary>
+		public static T GetParentComponent<T>(this Transform tr) where T : Component
+		{
+			T comp = null;
+			Transform parentTransform = tr.parent;
+			while (parentTransform != null)
+			{
+				comp = parentTransform.GetComponent<T>();
+				if (comp != null)
+					break;
+				parentTransform = parentTransform.parent;
+			}
+			return comp;
 		}
 
 	}
