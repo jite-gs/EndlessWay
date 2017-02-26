@@ -6,7 +6,8 @@ namespace EndlessWay
 	public interface IAreaObjectSource
 	{
 		int FreeObjectsCount { get; }
-		void Init(Dictionary<string, EnvObject> prefabsByPrototypeName, int maxObjectsByPrototype);
+		int Capacity { get; set; }
+		void Init(Dictionary<string, EnvObject> prefabsByPrototypeName, int capacity);
 		IAreaObject GetObject(string objectPrototypeName, Transform parentTransform);
 		void ReleaseObject(IAreaObject areaObject);
 	}

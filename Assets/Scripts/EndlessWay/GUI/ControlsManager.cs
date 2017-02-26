@@ -12,7 +12,7 @@ namespace EndlessWay
 
 		public Slider sliderMovementSpeed;
 		public Slider sliderDensity;
-		public Slider sliderFirstFillMaxObjects;
+		public Slider sliderMaxObjects;
 
 		public Text textSceneObjects;
 		public Text textFreeObjects;
@@ -27,7 +27,7 @@ namespace EndlessWay
 		public enum ParamName
 		{
 			MovementSpeed,
-			FirstFillMaxObjects,
+			MaxObjects,
 			FillDensity,
 			SceneObjectsCount,
 			FreeObjectsCount,
@@ -51,7 +51,7 @@ namespace EndlessWay
 				textFreeObjects.IsNull("textFreeObjects", selfType) ||
 				sliderMovementSpeed.IsNull("sliderMovementSpeed", selfType) ||
 				sliderDensity.IsNull("sliderDensity", selfType) ||
-				sliderFirstFillMaxObjects.IsNull("sliderFirstFillMaxObjects", selfType))
+				sliderMaxObjects.IsNull("sliderMaxObjects", selfType))
 			{
 				Logs.LogError("<{0}> '{1}' IsWrong", selfType, name);
 				IsWrong = true;
@@ -91,9 +91,9 @@ namespace EndlessWay
 			FloatParamChangedEvent(new FloatParamChangedEventArgs(ParamName.FillDensity, sliderDensity.value));
 		}
 
-		public void OnSliderFirstFillMaxObjects()
+		public void OnSliderMaxObjects()
 		{
-			IntParamChangedEvent(new IntParamChangedEventArgs(ParamName.FirstFillMaxObjects, (int)sliderFirstFillMaxObjects.value));
+			IntParamChangedEvent(new IntParamChangedEventArgs(ParamName.MaxObjects, (int)sliderMaxObjects.value));
 		}
 
 
@@ -107,8 +107,8 @@ namespace EndlessWay
 					sliderDensity.value = args.ParamValue;
 					break;
 
-				case ParamName.FirstFillMaxObjects:
-					sliderFirstFillMaxObjects.value = args.ParamValue;
+				case ParamName.MaxObjects:
+					sliderMaxObjects.value = args.ParamValue;
 					break;
 
 				case ParamName.MovementSpeed:

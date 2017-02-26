@@ -9,10 +9,11 @@ namespace EndlessWay
 {
 	public class Composer
 	{
-		private Dictionary<string, IAreaObjectSpecification> _areaObjectSpecifications;
+		private Dictionary<string, IObjectRule> _areaObjectSpecifications;
 		private List<string> _areaObjectNames;
 		private IAreaObjectSource _areaObjectSource;
 		private IRandom _random;
+		private bool _isVerbose = false;
 
 		private Type _selfType;
 
@@ -43,7 +44,7 @@ namespace EndlessWay
 
 		//=== Ctor ============================================================
 
-		public Composer(Dictionary<string, IAreaObjectSpecification> areaObjectSpecifications, IAreaObjectSource areaObjectSource,
+		public Composer(Dictionary<string, IObjectRule> areaObjectSpecifications, IAreaObjectSource areaObjectSource,
 			IRandom random)
 		{
 			_selfType = GetType();
@@ -80,23 +81,23 @@ namespace EndlessWay
 			NormalizeCorners(corner1, corner2, out leftBottomCorner, out rightTopCorner);
 
 			var area = (rightTopCorner.x - leftBottomCorner.x) * (rightTopCorner.y - leftBottomCorner.y);
+			var maxFilledArea = area * density;
 			float filledArea = 0;
 
 			var areaObjects = new List<IAreaObject>();
-			var maxFilledArea = area * density;
 			int objectsCount = 0;
 			while (objectsCount < maxObjects && filledArea < maxFilledArea)
 			{
-				IAreaObjectSpecification specification;
-				var areaObjectName = PickAreaObject(PickObjectStrategy.Random, out specification);
-				if (specification.IsNull("specification", _selfType))
+				IObjectRule rule;
+				var areaObjectName = PickAreaObject(PickObjectStrategy.Random, out rule);
+				if (rule.IsNull("rule", _selfType))
 					break;
 
 				var areaObject = _areaObjectSource.GetObject(areaObjectName, parentTransform);
 				if (areaObject == null)
 					break;
 
-				areaObject.ApplySpecification(specification);
+				areaObject.ApplySpecification(rule);
 				if (areaObject.IsWrong)
 				{
 					_areaObjectSource.ReleaseObject(areaObject);
@@ -123,7 +124,8 @@ namespace EndlessWay
 				//					occupiedAreaAsVector,
 				//					occupiedAreaAsVector.x * occupiedAreaAsVector.y);
 			}
-
+			if (_isVerbose)
+				Logs.Log("FillArea() area={0:f1}/{1:f1} objectsCount={2}/{3}", filledArea, maxFilledArea, objectsCount, maxObjects); //DEBUG
 			return areaObjects;
 		}
 
@@ -175,7 +177,7 @@ namespace EndlessWay
 
 				Bounds areaBounds = new Bounds();
 				areaBounds.SetMinMax(
-					new Vector3(leftBottomCorner.x,-1, leftBottomCorner.y),
+					new Vector3(leftBottomCorner.x, -1, leftBottomCorner.y),
 					new Vector3(rightTopCorner.x, 1, rightTopCorner.y));
 
 				for (int i = 0, len = areaObjectsForCheck.Count; i < len; i++)
@@ -200,13 +202,13 @@ namespace EndlessWay
 			return restOfObjects;
 		}
 
-		private string PickAreaObject(PickObjectStrategy pickObjectStrategy, out IAreaObjectSpecification specification)
+		private string PickAreaObject(PickObjectStrategy pickObjectStrategy, out IObjectRule rule)
 		{
 			switch (pickObjectStrategy)
 			{
 				case PickObjectStrategy.Random:
 					var areaObjectName = _areaObjectNames[_random.Range(0, _areaObjectNames.Count)];
-					specification = _areaObjectSpecifications[areaObjectName];
+					rule = _areaObjectSpecifications[areaObjectName];
 					return areaObjectName;
 
 				//TODO

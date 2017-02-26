@@ -6,6 +6,16 @@ namespace EndlessWay
 {
 	public abstract class EnvObject : MonoBehaviour, IAreaObject
 	{
+		public enum Tag
+		{
+			MajorObject,
+			MidObject,
+			MinorObject,
+			SmallPart,
+			Regular,
+			Oriented,
+		}
+
 		/// <summary>
 		/// Цвета объекта
 		/// </summary>
@@ -49,23 +59,23 @@ namespace EndlessWay
 
 		//=== Public ==========================================================
 
-		public virtual void ApplySpecification(IAreaObjectSpecification areaObjectSpecification)
+		public virtual void ApplySpecification(IObjectRule objectRule)
 		{
-			if (areaObjectSpecification.IsNull("areaObjectSpecification", _selfType) || areaObjectSpecification.IsWrong)
+			if (objectRule.IsNull("objectRule", _selfType) || objectRule.IsWrong)
 			{
 				IsWrong = true;
 				return;
 			}
 
-			if (areaObjectSpecification.IsColorable)
+			if (objectRule.IsColorable)
 			{
-				colors = areaObjectSpecification.GetColors();
+				colors = objectRule.GetColors();
 				ApplyColors();
 			}
 
-			if (areaObjectSpecification.IsSizeable)
+			if (objectRule.IsSizeable)
 			{
-				sizes = areaObjectSpecification.GetSizes();
+				sizes = objectRule.GetSizes();
 				ApplySizes();
 			}
 		}

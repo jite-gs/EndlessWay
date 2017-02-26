@@ -17,24 +17,30 @@ namespace EndlessWay
 
 		//=== Props ===========================================================
 
-		public int MaxObjects { get; set; }
+		public int Capacity { get; set; }
 
+		/// <summary>
+		/// ����� ��������������� ��������
+		/// </summary>
 		public int ObjectsCount { get; private set; }
 
+		/// <summary>
+		/// ����� ��������� �������� (�.�. ������� � ����)
+		/// </summary>
 		public int FreeObjectsCount { get { return _pool.Count; } }
 
 
 		//=== Ctor ============================================================
 
-		public ObjectPool(T prefab, int maxObjects = 10000)
+		public ObjectPool(T prefab, int capacity = 10000)
 		{
 			_selfType = GetType();
 			_prefab = prefab;
 			if (_prefab == null)
 				throw new NullReferenceException(_selfType.NiceName() + " ObjectPool() prefab is null");
 
-			MaxObjects = maxObjects;
-			_pool = new List<T>(MaxObjects);
+			Capacity = capacity;
+			_pool = new List<T>(Capacity);
 			ObjectsCount = 0;
 		}
 
@@ -43,16 +49,19 @@ namespace EndlessWay
 
 		public T GetObject(Transform parentTransform)
 		{
+			if(ObjectsCount >= Capacity)
+			{
+				if (_isVerbose)
+					Logs.Log("GetObject() Return null cause Capacity={0}", Capacity); //DEBUG
+				return null;
+			}
+
+			ObjectsCount++;
 			T freeObject = GetFreeObject(parentTransform);
 			if (freeObject != null)
 				return freeObject;
 
-			if (ObjectsCount < MaxObjects)
-				return CreateNewObject(parentTransform);
-
-			if (_isVerbose)
-				Logs.Log("GetObject() Return null cause maxObjects limit={0}", MaxObjects); //DEBUG
-			return null;
+			return CreateNewObject(parentTransform);
 		}
 
 
@@ -81,7 +90,6 @@ namespace EndlessWay
 
 		private T CreateNewObject(Transform parentTransform)
 		{
-			ObjectsCount++;
 			return UnityEngine.Object.Instantiate<T>(_prefab, parentTransform);
 		}
 
@@ -93,6 +101,7 @@ namespace EndlessWay
 				return;
 			}
 
+			ObjectsCount--;
 			_pool.Add(objectToRelease);
 		}
 	}

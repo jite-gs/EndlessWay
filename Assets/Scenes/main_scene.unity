@@ -1454,7 +1454,7 @@ MonoBehaviour:
       m_PersistentCalls:
         m_Calls:
         - m_Target: {fileID: 1347985981}
-          m_MethodName: OnSliderFirstFillMaxObjects
+          m_MethodName: OnSliderMaxObjects
           m_Mode: 1
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
@@ -2535,7 +2535,7 @@ MonoBehaviour:
   canvasActivator: {fileID: 1739920865}
   sliderMovementSpeed: {fileID: 221064563}
   sliderDensity: {fileID: 724325293}
-  sliderFirstFillMaxObjects: {fileID: 666136132}
+  sliderMaxObjects: {fileID: 666136132}
   textSceneObjects: {fileID: 1518830041}
   textFreeObjects: {fileID: 293195010}
 --- !u!4 &1347985982
@@ -3125,7 +3125,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   isVerbose: 0
   density: 0.1
-  firstFillMaxObjects: 5000
+  maxObjects: 10000
   movementSpeed: 80
   objectsAreaDepth: 600
   objectsAreaWidth: 600
@@ -3140,76 +3140,35 @@ MonoBehaviour:
   - {fileID: 114935826370864998, guid: 21e9b3cf614452f4b8106d05147cbd97, type: 2}
   - {fileID: 114079880970676850, guid: 49e50f5fad47ea44ebf10fd437ef2582, type: 2}
   - {fileID: 114158826857227910, guid: 22d22741719d2014aa5280acf710fa10, type: 2}
-  specifications:
-  - associatedEnvObjectName: CubeObject
+  rules:
+  - tags: 
+    associatedEnvObjectName: CubeObject
     colorsLength: 1
     sizesLength: 1
     colorRanges:
     - isFixedColors: 0
       fixedColors: []
-      loColor: {r: 0, g: 1, b: 0, a: 1}
-      hiColor: {r: 0, g: 0, b: 1, a: 1}
-    sizeRanges:
-    - isFixedSizes: 0
-      fixedSizes: []
-      loSize: 1
-      hiSize: 2
-  - associatedEnvObjectName: CubeObjectBuilding
-    colorsLength: 1
-    sizesLength: 1
-    colorRanges:
-    - isFixedColors: 0
-      fixedColors: []
-      loColor: {r: 0.64852935, g: 0.7205882, b: 0.6305147, a: 1}
-      hiColor: {r: 0.41287136, g: 0.46323532, b: 0.23502381, a: 1}
-    sizeRanges:
-    - isFixedSizes: 0
-      fixedSizes: []
-      loSize: 1
-      hiSize: 2
-  - associatedEnvObjectName: PillarObject
-    colorsLength: 1
-    sizesLength: 1
-    colorRanges:
-    - isFixedColors: 0
-      fixedColors: []
-      loColor: {r: 0.74264705, g: 0.6478955, b: 0.3385597, a: 1}
-      hiColor: {r: 0.78676474, g: 0.46559557, b: 0.121485755, a: 1}
-    sizeRanges:
-    - isFixedSizes: 0
-      fixedSizes: []
-      loSize: 1
-      hiSize: 3
-  - associatedEnvObjectName: SphereObject
-    colorsLength: 1
-    sizesLength: 1
-    colorRanges:
-    - isFixedColors: 1
-      fixedColors:
-      - {r: 1, g: 0, b: 0, a: 1}
-      - {r: 1, g: 1, b: 0, a: 1}
-      - {r: 0, g: 1, b: 0, a: 1}
-      - {r: 1, g: 1, b: 1, a: 1}
       loColor: {r: 0, g: 0, b: 0, a: 0}
-      hiColor: {r: 0, g: 0, b: 0, a: 0}
+      hiColor: {r: 1, g: 0, b: 0, a: 1}
     sizeRanges:
     - isFixedSizes: 0
       fixedSizes: []
       loSize: 1
-      hiSize: 4
-  - associatedEnvObjectName: PortalObject
+      hiSize: 2
+  - tags: 
+    associatedEnvObjectName: SphereObject
     colorsLength: 1
     sizesLength: 1
     colorRanges:
     - isFixedColors: 0
       fixedColors: []
-      loColor: {r: 0.285359, g: 0.36740395, b: 0.6691177, a: 0.615}
-      hiColor: {r: 0.44852942, g: 0.1908752, b: 0.13192041, a: 1}
+      loColor: {r: 0, g: 0, b: 0, a: 0}
+      hiColor: {r: 0, g: 1, b: 0, a: 1}
     sizeRanges:
     - isFixedSizes: 0
       fixedSizes: []
       loSize: 1
-      hiSize: 3
+      hiSize: 10
 --- !u!4 &1687563865
 Transform:
   m_ObjectHideFlags: 0

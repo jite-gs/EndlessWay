@@ -10,11 +10,29 @@ namespace EndlessWay
 		private Dictionary<string, ObjectPool<EnvObject>> _pools = new Dictionary<string, ObjectPool<EnvObject>>();
 		private Dictionary<EnvObject, ObjectPool<EnvObject>> _allInstances;
 		private Vector3 _freeObjectsPoint;
+		private int _capacity;
 
 		private Type _selfType;
 
 
 		//=== Prop ============================================================
+
+		public int Capacity
+		{
+			get { return _capacity; }
+			set
+			{
+				if (_pools == null)
+					throw new NullReferenceException("Attempt to set Capacity whereas pools is null");
+
+				if (value <= 0)
+					throw new Exception("Attempt to set wrong value for Capacity: " + value);
+
+				_capacity = value;
+				foreach (var objectPool in _pools.Values)
+					objectPool.Capacity = _capacity;
+			}
+		}
 
 		public int FreeObjectsCount
 		{
@@ -43,18 +61,18 @@ namespace EndlessWay
 
 		//=== Public ==========================================================
 
-		public void Init(Dictionary<string, EnvObject> prefabsByPrototypeName, int maxObjectsByPrototype)
+		public void Init(Dictionary<string, EnvObject> prefabsByPrototypeName, int capacity)
 		{
 			_selfType = GetType();
 			if (prefabsByPrototypeName == null)
 				throw new NullReferenceException("ObjectPoolsManager.Init() prefabsByPrototypeName is null");
 
-			var allInstancesCapacity = prefabsByPrototypeName.Count * maxObjectsByPrototype;
-			_allInstances = new Dictionary<EnvObject, ObjectPool<EnvObject>>(allInstancesCapacity);
+			_allInstances = new Dictionary<EnvObject, ObjectPool<EnvObject>>(Capacity);
 			foreach (var kvp in prefabsByPrototypeName)
 			{
-				_pools.Add(kvp.Key, new ObjectPool<EnvObject>(kvp.Value, maxObjectsByPrototype));
+				_pools.Add(kvp.Key, new ObjectPool<EnvObject>(kvp.Value));
 			}
+			Capacity = capacity;
 		}
 
 		public IAreaObject GetObject(string objectPrototypeName, Transform parentTransform)

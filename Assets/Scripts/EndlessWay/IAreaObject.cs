@@ -7,6 +7,6 @@ namespace EndlessWay
 		bool IsWrong { get; }
 		Vector3 Point { get; set; }
 		Vector2 GetOccupiedArea();
-		void ApplySpecification(IAreaObjectSpecification areaObjectSpecification);
+		void ApplySpecification(IObjectRule objectRule);
 	}
 }

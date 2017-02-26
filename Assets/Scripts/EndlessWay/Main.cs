@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using DebugStuff;
 using SomeRandom;
 using UnityEngine;
-using UnityEngine.EventSystems;
-using UnityEngine.UI;
 
 namespace EndlessWay
 {
@@ -13,7 +11,6 @@ namespace EndlessWay
 	/// </summary>
 	public class Main : MonoBehaviour
 	{
-		public const int MaxSettedObjectsTotal = 10000;
 		public const int AreaOvermeasure = 10;
 		public const int MaxMapDistance = 5000;
 
@@ -24,9 +21,9 @@ namespace EndlessWay
 		/// </summary>
 		public float density = .1f;
 		/// <summary>
-		/// Максимальное число объектов при первом заполнении
+		/// Максимальное число объектов на сцене
 		/// </summary>
-		public int firstFillMaxObjects = 1000;
+		public int maxObjects = 10000;
 		/// <summary>
 		/// Скорость движения камеры
 		/// </summary>
@@ -58,16 +55,16 @@ namespace EndlessWay
 
 		public Transform objectsParent;
 		public EnvObject[] envObjectPrefabs;
-		public EnvObjectSpecification[] specifications;
+		public EnvObjectRule[] rules;
 
 		/// <summary>
 		/// Префабы со своими спецификациями - по подтипам 
 		/// </summary>
-		private Dictionary<string, KeyValuePair<EnvObject, EnvObjectSpecification>> _objectInfosByPrototypeName;
+		private Dictionary<string, KeyValuePair<EnvObject, EnvObjectRule>> _objectInfosByPrototypeName;
 
 		private Composer _composer;
 		private IAreaObjectSource _areaObjectSource;
-		private Queue<IAreaObject> _areaObjectsQueue = new Queue<IAreaObject>(MaxSettedObjectsTotal);
+		private Queue<IAreaObject> _areaObjectsQueue = new Queue<IAreaObject>();
 
 		private Transform _cameraTransform;
 		private float _lastFillZ, _lastClearZ;
@@ -88,7 +85,7 @@ namespace EndlessWay
 		{
 			_controlsManager = FindObjectOfType<ControlsManager>();
 			if (envObjectPrefabs.IsNull("envObjectPrefabs", _selfType) ||
-				specifications.IsNull("specifications", _selfType) ||
+				rules.IsNull("rules", _selfType) ||
 				objectsParent.IsNull("objectsParent", _selfType) ||
 				_controlsManager.IsNull("_controlsManager", _selfType) ||
 				_controlsManager.IsWrong)
@@ -101,22 +98,19 @@ namespace EndlessWay
 			_controlsManager.FloatParamChangedEvent += OnFloatParamChanged;
 			_controlsManager.SetSliderValue(new FloatParamChangedEventArgs(ControlsManager.ParamName.MovementSpeed, movementSpeed));
 			_controlsManager.SetSliderValue(new FloatParamChangedEventArgs(ControlsManager.ParamName.FillDensity, density));
-			_controlsManager.SetSliderValue(new FloatParamChangedEventArgs(ControlsManager.ParamName.FirstFillMaxObjects, firstFillMaxObjects));
+			_controlsManager.SetSliderValue(new FloatParamChangedEventArgs(ControlsManager.ParamName.MaxObjects, maxObjects));
 
 			var unityRandom = new UnityRandom();
-			int maxObjectsCountByPrototype = MaxSettedObjectsTotal / envObjectPrefabs.Length;
+			_objectInfosByPrototypeName = GetObjectInfosByPrototypeName(envObjectPrefabs, rules, unityRandom);
 
-			_objectInfosByPrototypeName = GetObjectInfosByPrototypeName(
-				envObjectPrefabs, specifications, unityRandom, maxObjectsCountByPrototype);
-
-			var areaObjectSpecifications = new Dictionary<string, IAreaObjectSpecification>();
+			var areaObjectSpecifications = new Dictionary<string, IObjectRule>();
 			var prefabsByPrototypeName = new Dictionary<string, EnvObject>();
 			foreach (var kvp in _objectInfosByPrototypeName)
 			{
 				prefabsByPrototypeName.Add(kvp.Key, kvp.Value.Key);
 				if (kvp.Value.Value == null)
 				{
-					Logs.Log("_objectInfosByPrototypeName['{0}'] hasn't specification", kvp.Key);
+					Logs.LogWarning("_objectInfosByPrototypeName['{0}'] hasn't rule", kvp.Key);
 				}
 				else
 				{
@@ -126,7 +120,7 @@ namespace EndlessWay
 
 			//_areaObjectSource = new SimpleInstantiator();
 			_areaObjectSource = new ObjectPoolsManager(Vector3.up * 100 + Vector3.back * 100);
-			_areaObjectSource.Init(prefabsByPrototypeName, maxObjectsCountByPrototype);
+			_areaObjectSource.Init(prefabsByPrototypeName, maxObjects);
 			_composer = new Composer(areaObjectSpecifications, _areaObjectSource, unityRandom);
 
 			_cameraTransform = Camera.main.transform;
@@ -167,8 +161,8 @@ namespace EndlessWay
 		{
 			switch (eventArgs.ParamName)
 			{
-				case ControlsManager.ParamName.FirstFillMaxObjects:
-					firstFillMaxObjects = eventArgs.ParamValue;
+				case ControlsManager.ParamName.MaxObjects:
+					maxObjects = eventArgs.ParamValue;
 					break;
 
 				default:
@@ -198,11 +192,10 @@ namespace EndlessWay
 
 		//=== Private =========================================================
 
-		private Dictionary<string, KeyValuePair<EnvObject, EnvObjectSpecification>> GetObjectInfosByPrototypeName(
-			EnvObject[] prefabs, EnvObjectSpecification[] specs, IRandom random, int maxObjectsCountByPrototype)
+		private Dictionary<string, KeyValuePair<EnvObject, EnvObjectRule>> GetObjectInfosByPrototypeName(
+			EnvObject[] prefabs, EnvObjectRule[] specs, IRandom random)
 		{
-			var objectInfosByPrototypeName =
-				new Dictionary<string, KeyValuePair<EnvObject, EnvObjectSpecification>>(maxObjectsCountByPrototype);
+			var objectInfosByPrototypeName = new Dictionary<string, KeyValuePair<EnvObject, EnvObjectRule>>();
 			for (int i = 0, len = prefabs.Length; i < len; i++)
 			{
 				var envObject = prefabs[i];
@@ -215,26 +208,26 @@ namespace EndlessWay
 					continue;
 				}
 
-				objectInfosByPrototypeName.Add(envObject.name, new KeyValuePair<EnvObject, EnvObjectSpecification>(envObject, null));
+				objectInfosByPrototypeName.Add(envObject.name, new KeyValuePair<EnvObject, EnvObjectRule>(envObject, null));
 			}
 
 			for (int i = 0, len = specs.Length; i < len; i++)
 			{
 				var specification = specs[i];
-				if (specification.IsNull("specification[" + i + "]", _selfType) ||
+				if (specification.IsNull("rule[" + i + "]", _selfType) ||
 					!specification.Init(random))
 					continue;
 
-				KeyValuePair<EnvObject, EnvObjectSpecification> kvp;
+				KeyValuePair<EnvObject, EnvObjectRule> kvp;
 				if (!objectInfosByPrototypeName.TryGetValue(specification.associatedEnvObjectName, out kvp))
 				{
-					Logs.LogError("objectInfosByPrototypeName don't contains envObject '{0}' for specification[{0}]",
+					Logs.LogError("objectInfosByPrototypeName don't contains envObject '{0}' for rule[{0}]",
 						specification.associatedEnvObjectName, i);
 					continue;
 				}
 
 				objectInfosByPrototypeName[specification.associatedEnvObjectName] =
-					new KeyValuePair<EnvObject, EnvObjectSpecification>(kvp.Key, specification);
+					new KeyValuePair<EnvObject, EnvObjectRule>(kvp.Key, specification);
 			}
 			return objectInfosByPrototypeName;
 		}
@@ -273,7 +266,9 @@ namespace EndlessWay
 			_lastFillZ = _lastClearZ = currentCamZ;
 			var nearZ = currentCamZ;
 			var farZ = nearZ + objectsAreaDepth;
-
+			var fillAreaTotal = (objectsAreaDepth + 2 * areaFillsInterval) * (objectsAreaWidth - centerEmptySpaceWidth);
+			var firstFillArea = objectsAreaDepth * (objectsAreaWidth - centerEmptySpaceWidth);
+			var firstFillMaxObjects = Mathf.RoundToInt(maxObjects * firstFillArea / fillAreaTotal);
 			FillArea(nearZ, farZ, objectsAreaWidth, centerEmptySpaceWidth, density, firstFillMaxObjects, objectsParent);
 		}
 
@@ -282,15 +277,20 @@ namespace EndlessWay
 			if (currentCamZ - _lastFillZ < areaFillsInterval)
 				return;
 
+			if (maxObjects != _areaObjectSource.Capacity)
+				_areaObjectSource.Capacity = maxObjects;
+
 			var nearZ = _lastFillZ + objectsAreaDepth;
 			var farZ = nearZ + areaFillsInterval;
-			var updateFillMaxObjects = (int)(firstFillMaxObjects * areaFillsInterval / objectsAreaDepth);
+			var fillAreaTotal = (objectsAreaDepth + 2 * areaFillsInterval) * (objectsAreaWidth - centerEmptySpaceWidth);
+			var updateFillArea = areaFillsInterval * (objectsAreaWidth - centerEmptySpaceWidth);
+			var updateFillMaxObjects = Mathf.RoundToInt(maxObjects * updateFillArea / fillAreaTotal);
 			_lastFillZ += areaFillsInterval;
 			FillArea(nearZ, farZ, objectsAreaWidth, centerEmptySpaceWidth, density, updateFillMaxObjects, objectsParent);
 		}
 
 		private void FillArea(float nearZ, float farZ, float fillWdt, float centerEmptySpaceWdt,
-			float objectsDensity, int maxObjects, Transform parentTransformForObjects)
+			float objectsDensity, int fillMaxObjects, Transform parentTransformForObjects)
 		{
 			int newObjectsCount = 0;
 			var newObjects = _composer.FillArea(
@@ -298,7 +298,7 @@ namespace EndlessWay
 				new Vector2(-centerEmptySpaceWdt / 2, farZ),
 				parentTransformForObjects,
 				objectsDensity,
-				maxObjects / 2);
+				fillMaxObjects / 2);
 
 			if (newObjects != null)
 			{
@@ -314,7 +314,7 @@ namespace EndlessWay
 							new Vector2(fillWdt / 2, farZ),
 							parentTransformForObjects,
 							objectsDensity,
-							maxObjects / 2);
+							fillMaxObjects / 2);
 
 			if (newObjects != null)
 			{
@@ -395,7 +395,6 @@ namespace EndlessWay
 			//				return;
 			//
 			//			Logs.Log("currentSelectedGameObject {0}", _eventSystem.currentSelectedGameObject.VarDump());
-
 		}
 
 	}

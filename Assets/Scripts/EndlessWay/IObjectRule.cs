@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace EndlessWay
 {
-	public interface IAreaObjectSpecification
+	public interface IObjectRule
 	{
 		bool IsSizeable { get; }
 		bool IsColorable { get; }

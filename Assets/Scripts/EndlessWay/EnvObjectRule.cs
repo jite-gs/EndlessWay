@@ -9,8 +9,10 @@ namespace EndlessWay
 	/// Базовые правила случайных параметров объекта
 	/// </summary>
 	[Serializable]
-	public class EnvObjectSpecification : IAreaObjectSpecification
+	public class EnvObjectRule : IObjectRule
 	{
+
+		public EnvObject.Tag[] tags;
 		public string associatedEnvObjectName;
 		public int colorsLength;
 		public int sizesLength;
@@ -20,7 +22,7 @@ namespace EndlessWay
 
 		private IRandom _random;
 
-		private static Type _selfType = typeof(EnvObjectSpecification);
+		private static Type _selfType = typeof(EnvObjectRule);
 
 
 		//=== Props ===========================================================
@@ -48,7 +50,7 @@ namespace EndlessWay
 			{
 				if (sizeRanges == null || sizeRanges.Length != sizesLength)
 				{
-					Logs.LogError("EnvObjectSpecification: sizeRanges ({0}) isn't corresponds sizesLength={1}",
+					Logs.LogError("EnvObjectRule: sizeRanges ({0}) isn't corresponds sizesLength={1}",
 						sizeRanges == null ? "null" : "length=" + sizeRanges.Length,
 						sizesLength);
 					IsWrong = true;
@@ -61,7 +63,7 @@ namespace EndlessWay
 					sizeRange.Init();
 					if (sizeRange.IsWrong)
 					{
-						Logs.LogError("EnvObjectSpecification: sizeRange[{0}] is wrong!", i);
+						Logs.LogError("EnvObjectRule: sizeRange[{0}] is wrong!", i);
 						IsWrong = true;
 						return false;
 					}
@@ -72,7 +74,7 @@ namespace EndlessWay
 			{
 				if (colorRanges == null || colorRanges.Length != colorsLength)
 				{
-					Logs.LogError("EnvObjectSpecification: colorRanges ({0}) isn't corresponds colorsLength={1}",
+					Logs.LogError("EnvObjectRule: colorRanges ({0}) isn't corresponds colorsLength={1}",
 						colorRanges == null ? "null" : "length=" + colorRanges.Length,
 						colorsLength);
 					IsWrong = true;
@@ -85,7 +87,7 @@ namespace EndlessWay
 					colorRange.Init();
 					if (colorRange.IsWrong)
 					{
-						Logs.LogError("EnvObjectSpecification: colorRange[{0}] is wrong!", i);
+						Logs.LogError("EnvObjectRule: colorRange[{0}] is wrong!", i);
 						IsWrong = true;
 						return false;
 					}
