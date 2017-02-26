@@ -11,9 +11,8 @@ namespace EndlessWay
 	[Serializable]
 	public class EnvObjectRule : IObjectRule
 	{
-
-		public EnvObject.Tag[] tags;
 		public string associatedEnvObjectName;
+		public EnvObject.Tag[] tags;
 		public int colorsLength;
 		public int sizesLength;
 

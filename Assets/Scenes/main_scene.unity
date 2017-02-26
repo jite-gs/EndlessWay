@@ -3141,8 +3141,8 @@ MonoBehaviour:
   - {fileID: 114079880970676850, guid: 49e50f5fad47ea44ebf10fd437ef2582, type: 2}
   - {fileID: 114158826857227910, guid: 22d22741719d2014aa5280acf710fa10, type: 2}
   rules:
-  - tags: 
-    associatedEnvObjectName: CubeObject
+  - associatedEnvObjectName: CubeObject
+    tags: 
     colorsLength: 1
     sizesLength: 1
     colorRanges:
@@ -3154,9 +3154,9 @@ MonoBehaviour:
     - isFixedSizes: 0
       fixedSizes: []
       loSize: 1
-      hiSize: 2
-  - tags: 
-    associatedEnvObjectName: SphereObject
+      hiSize: 3
+  - associatedEnvObjectName: SphereObject
+    tags: 
     colorsLength: 1
     sizesLength: 1
     colorRanges:
@@ -3167,6 +3167,51 @@ MonoBehaviour:
     sizeRanges:
     - isFixedSizes: 0
       fixedSizes: []
+      loSize: 6
+      hiSize: 10
+  - associatedEnvObjectName: CubeObjectBuilding
+    tags: 
+    colorsLength: 1
+    sizesLength: 1
+    colorRanges:
+    - isFixedColors: 0
+      fixedColors: []
+      loColor: {r: 0.18733782, g: 0.18733782, b: 0.33088237, a: 1}
+      hiColor: {r: 0, g: 0, b: 0, a: 1}
+    sizeRanges:
+    - isFixedSizes: 0
+      fixedSizes: []
+      loSize: 1
+      hiSize: 4
+  - associatedEnvObjectName: PortalObject
+    tags: 
+    colorsLength: 1
+    sizesLength: 1
+    colorRanges:
+    - isFixedColors: 0
+      fixedColors: []
+      loColor: {r: 0.6838235, g: 0.64862674, b: 0.64862674, a: 1}
+      hiColor: {r: 0.3737024, g: 0.4104522, b: 0.4705882, a: 1}
+    sizeRanges:
+    - isFixedSizes: 0
+      fixedSizes: []
+      loSize: 1
+      hiSize: 2
+  - associatedEnvObjectName: PillarObject
+    tags: 
+    colorsLength: 1
+    sizesLength: 1
+    colorRanges:
+    - isFixedColors: 0
+      fixedColors: []
+      loColor: {r: 0.36946073, g: 0.14987022, b: 0.9264706, a: 1}
+      hiColor: {r: 0.6745466, g: 0.3867863, b: 0.7205882, a: 1}
+    sizeRanges:
+    - isFixedSizes: 1
+      fixedSizes:
+      - 1
+      - 2
+      - 3
       loSize: 1
       hiSize: 10
 --- !u!4 &1687563865
